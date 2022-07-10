@@ -1,1 +1,0 @@
-gcc TreeUN.c -lm -g -Wall -o ../TreeUN

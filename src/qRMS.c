@@ -11,7 +11,7 @@ This software is released under the three-clause BSD License, see LICENSE.txt.
 
  RMS calculation based using quaternion-rotation
 
- based on 
+ based on
   Charles F.F. Karney "Quaternions in molecular modeling"
   E-print: arXiv:physics/0506177
 
@@ -20,6 +20,7 @@ This software is released under the three-clause BSD License, see LICENSE.txt.
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>  // needed on MacOS M1
 #include "2DMAP.h"
 #include "molecule.h"
 #include "match.h"
@@ -71,7 +72,7 @@ void Malloc_POS_ARRAY(PosArray,N)
 {
  int i;
  PosArray->Nmalloc = N;
- PosArray->pos = (double **)malloc(sizeof(double *) * N); 
+ PosArray->pos = (double **)malloc(sizeof(double *) * N);
  for (i=0;i<N;++i){
    PosArray->pos[i] = (double *)malloc(sizeof(double)*3);}
 } /* end of Malloc_POS_ARRAY() */
@@ -90,39 +91,39 @@ void Free_POS_ARRAY(PosArray)
 
 
 float Calculate_CRMS_MATCH_Quaternion(match,mA,mB,gA,gB,Rmat,SupType)
-  struct MATCH    *match; 
+  struct MATCH    *match;
   struct MOLECULE *mA,*mB;  /* mA will be transformed on mB. */
   double gA[3],gB[3]; /* Center position */
   double Rmat[3][3];  /* Rotation Matrix */
   char   *SupType;    /* "BonA" or "AonB" */
-{ 
+{
   int i,j;
   float rms;
   struct POS_ARRAY mch_posT;  /* matched atoms of target (to be transformed) */
   struct POS_ARRAY mch_posR;  /* matched atoms of refererence (fixed)       */
- 
+
   if (match->Npair==0){
     gA[0] = gA[1] = gA[2] = 0.0;
     gB[0] = gB[1] = gA[2] = 0.0;
-    Rmat[0][0] = 1.0; Rmat[0][1] = 0.0; Rmat[0][2] = 0.0; 
-    Rmat[1][0] = 0.0; Rmat[1][1] = 1.0; Rmat[1][2] = 0.0; 
-    Rmat[2][0] = 0.0; Rmat[2][1] = 0.0; Rmat[2][2] = 1.0; 
+    Rmat[0][0] = 1.0; Rmat[0][1] = 0.0; Rmat[0][2] = 0.0;
+    Rmat[1][0] = 0.0; Rmat[1][1] = 1.0; Rmat[1][2] = 0.0;
+    Rmat[2][0] = 0.0; Rmat[2][1] = 0.0; Rmat[2][2] = 1.0;
     return(0.0);
   }
 
   Malloc_POS_ARRAY(&mch_posT,match->Npair);
   Malloc_POS_ARRAY(&mch_posR,match->Npair);
-  mch_posT.N = mch_posR.N = match->Npair; 
+  mch_posT.N = mch_posR.N = match->Npair;
 
   for (i=0;i<match->Npair;++i){
     for (j=0;j<3;++j){
       if (strcmp(SupType,"BonA")==0){
-        mch_posT.pos[i][j] = mB->atoms[match->anumB[i]].Pos[j]; 
-        mch_posR.pos[i][j] = mA->atoms[match->anumA[i]].Pos[j]; 
+        mch_posT.pos[i][j] = mB->atoms[match->anumB[i]].Pos[j];
+        mch_posR.pos[i][j] = mA->atoms[match->anumA[i]].Pos[j];
       }
       else{
-        mch_posT.pos[i][j] = mA->atoms[match->anumA[i]].Pos[j]; 
-        mch_posR.pos[i][j] = mB->atoms[match->anumB[i]].Pos[j]; 
+        mch_posT.pos[i][j] = mA->atoms[match->anumA[i]].Pos[j];
+        mch_posR.pos[i][j] = mB->atoms[match->anumB[i]].Pos[j];
       }
     }
   }
@@ -143,11 +144,11 @@ float Calculate_CRMS_MATCH_Quaternion(match,mA,mB,gA,gB,Rmat,SupType)
   */
 
   /** Randomize for match->Npair==1 or 2 **/
-  if (match->Npair==1){ 
-    make_random_rotmatrix(Rmat); 
+  if (match->Npair==1){
+    make_random_rotmatrix(Rmat);
     /* print_matrix3(Rmat,"Rmat_new"); */
-  } 
-  else if (match->Npair==2){ 
+  }
+  else if (match->Npair==2){
     multiply_by_two_points_axis_random_rotmatrix(Rmat, mch_posR.pos[0], mch_posR.pos[1]);
     /* print_matrix3(Rmat,"Rmat_new"); */
   }
@@ -171,43 +172,43 @@ float Calculate_CRMS_MATCH_Quaternion(match,mA,mB,gA,gB,Rmat,SupType)
 
 
 float Calculate_CRMS_bwn_POS_ARRAYs(parrayA,parrayB)
- struct POS_ARRAY *parrayA,*parrayB; 
-{ 
+ struct POS_ARRAY *parrayA,*parrayB;
+{
   int i,j;
   float rms;
   double gA[3],gB[3]; /* Center position */
   double Rmat[3][3];  /* Rotation Matrix */
-  struct POS_ARRAY pAtmp,pBtmp; 
+  struct POS_ARRAY pAtmp,pBtmp;
 
   if (parrayA->N==0){
     for (i=0;i<3;++i){
       gA[i] = gB[i] = 0.0;
       for (j=0;j<3;++j){ Rmat[i][j] = 0.0; }
-      Rmat[i][i] = 1.0; 
+      Rmat[i][i] = 1.0;
     }
     return(0.0);
   }
 
  /*
-  for (i=0;i<parrayA->N;++i){ 
+  for (i=0;i<parrayA->N;++i){
     printf("HETATM%5d %4s%4s %s%4d    %8.3f%8.3f%8.3f\n",
        i+1,"C","MOL","A",i+1, parrayA->pos[i][0], parrayA->pos[i][1], parrayA->pos[i][2]);
   }
-  for (i=0;i<parrayB->N;++i){ 
+  for (i=0;i<parrayB->N;++i){
     printf("HETATM%5d %4s%4s %s%4d    %8.3f%8.3f%8.3f\n",
        i+1,"C","MOL","B",i+1, parrayB->pos[i][0], parrayB->pos[i][1], parrayB->pos[i][2]);
   }
   */
   /* [1] Copy parrayA to pAtmp, parrayB to pBtmp */
   Malloc_POS_ARRAY(&pAtmp,parrayA->N);
-  pAtmp.N = parrayA->N; 
-  for (i=0;i<parrayA->N;++i){ 
+  pAtmp.N = parrayA->N;
+  for (i=0;i<parrayA->N;++i){
     for (j=0;j<3;++j){ pAtmp.pos[i][j] = parrayA->pos[i][j]; }
   }
 
   Malloc_POS_ARRAY(&pBtmp,parrayB->N);
-  pBtmp.N = parrayB->N; 
-  for (i=0;i<parrayB->N;++i){ 
+  pBtmp.N = parrayB->N;
+  for (i=0;i<parrayB->N;++i){
     for (j=0;j<3;++j){ pBtmp.pos[i][j] = parrayB->pos[i][j]; }
   }
 
@@ -222,10 +223,10 @@ float Calculate_CRMS_bwn_POS_ARRAYs(parrayA,parrayB)
   */
 
   /** Randomize for match->Npair==1 or 2 **/
-  if (parrayA->N==1){ 
-    make_random_rotmatrix(Rmat); 
-  } 
-  else if (parrayA->N==2){ 
+  if (parrayA->N==1){
+    make_random_rotmatrix(Rmat);
+  }
+  else if (parrayA->N==2){
     multiply_by_two_points_axis_random_rotmatrix(Rmat, pAtmp.pos[0], pBtmp.pos[1]);
     /* print_matrix3(Rmat,"Rmat_new"); */
   }
@@ -246,17 +247,17 @@ float Calculate_CRMS_bwn_POS_ARRAYs(parrayA,parrayB)
 
 
 float CRMS_MATCHed_Molecules_without_Superimpose(match,mA,mB)
- struct MATCH    *match; 
- struct MOLECULE *mA,*mB; 
-{ 
+ struct MATCH    *match;
+ struct MOLECULE *mA,*mB;
+{
   int i,j;
   float rms,d;
- 
-  rms = 0.0; 
+
+  rms = 0.0;
   if (match->Npair>0){
     for (i=0;i<match->Npair;++i){
       for (j=0;j<3;++j){
-        d = mA->atoms[match->anumA[i]].Pos[j] - mB->atoms[match->anumB[i]].Pos[j]; 
+        d = mA->atoms[match->anumA[i]].Pos[j] - mB->atoms[match->anumB[i]].Pos[j];
         rms += d*d;
       }
     }
@@ -269,15 +270,15 @@ float CRMS_MATCHed_Molecules_without_Superimpose(match,mA,mB)
 
 
 float CRMS_Same_Molecules_without_Superimpose(mA,mB)
- struct MOLECULE *mA,*mB; 
-{ 
+ struct MOLECULE *mA,*mB;
+{
   int i,j;
   float rms,d;
- 
-  rms = 0.0; 
+
+  rms = 0.0;
   for (i=0;i<mA->Natom;++i){
     for (j=0;j<3;++j){
-      d = mA->atoms[i].Pos[j] - mB->atoms[i].Pos[j]; 
+      d = mA->atoms[i].Pos[j] - mB->atoms[i].Pos[j];
       rms += d*d;
     }
   }
@@ -291,22 +292,22 @@ float CRMS_Same_Molecules_without_Superimpose(mA,mB)
 
 
 float Calculate_CRMS_Quaternion_BandA(match,mA,mB,g1,g2,Rmat)
- struct MATCH    *match; 
- struct MOLECULE *mA,*mB; 
+ struct MATCH    *match;
+ struct MOLECULE *mA,*mB;
  double g1[3],g2[3]; /* Center position */
  double Rmat[3][3];  /* Rotation Matrix */
-{ 
+{
   int i,j;
   float rms;
   struct POS_ARRAY mch_posA,mch_posB;  /* matched atoms */
 
   Malloc_POS_ARRAY(&mch_posA,match->Npair);
   Malloc_POS_ARRAY(&mch_posB,match->Npair);
-  mch_posA.N = mch_posB.N = match->Npair; 
+  mch_posA.N = mch_posB.N = match->Npair;
   for (i=0;i<match->Npair;++i){
     for (j=0;j<3;++j){
-      mch_posA.pos[i][j] = mA->atoms[match->anumB[i]].Pos[j]; 
-      mch_posB.pos[i][j] = mB->atoms[match->anumA[i]].Pos[j]; 
+      mch_posA.pos[i][j] = mA->atoms[match->anumB[i]].Pos[j];
+      mch_posB.pos[i][j] = mB->atoms[match->anumA[i]].Pos[j];
     }
   }
 
@@ -332,7 +333,7 @@ float Rotate_Molecule(mA,gA,gB,Rmat)
  double Rmat[3][3];
  /**
   return [rmsd between original and rotated molecules].
-  **/ 
+  **/
 {
  int i,j;
  double pos[3],newpos[3],rpos[3];
@@ -351,12 +352,12 @@ float Rotate_Molecule(mA,gA,gB,Rmat)
  for (i=0;i<mA->Natom;++i){
  /*
    printf("#%d (%f %f %f) -->" ,i,mA->atoms[i].Pos[0], mA->atoms[i].Pos[1], mA->atoms[i].Pos[2]);
- */ 
+ */
   for (j=0;j<3;++j) { pos[j] = mA->atoms[i].Pos[j] - gA[j];}
 
    Mult_Mat_Vec3(rpos,Rmat,pos);
 
-   for (j=0;j<3;++j){  
+   for (j=0;j<3;++j){
      newpos[j] = rpos[j] + gB[j];
      rmsd += (newpos[j]-mA->atoms[i].Pos[j])*(newpos[j]-mA->atoms[i].Pos[j]);
      mA->atoms[i].Pos[j] = newpos[j];
@@ -366,7 +367,7 @@ float Rotate_Molecule(mA,gA,gB,Rmat)
  */
  }
  return(sqrt(rmsd/mA->Natom));
- 
+
 } /* end of Rotate_Molecule() */
 
 
@@ -377,7 +378,7 @@ float RMSD_bwn_Rotated_and_Init(mA,gA,gB,Rmat)
  double Rmat[3][3];
  /**
   return [rmsd between original and rotated molecules].
-  **/ 
+  **/
 {
  int i,j;
  double pos[3],newpos[3],rpos[3];
@@ -387,13 +388,13 @@ float RMSD_bwn_Rotated_and_Init(mA,gA,gB,Rmat)
  for (i=0;i<mA->Natom;++i){
    for (j=0;j<3;++j) pos[j] = mA->atoms[i].Pos[j] - gA[j];
    Mult_Mat_Vec3(rpos,Rmat,pos);
-   for (j=0;j<3;++j){  
+   for (j=0;j<3;++j){
      newpos[j] = rpos[j] + gB[j];
      rmsd += (newpos[j]-mA->atoms[i].Pos[j])*(newpos[j]-mA->atoms[i].Pos[j]);
    }
  }
  return(sqrt(rmsd/mA->Natom));
- 
+
 } /* end of RMSD_bwn_Rotated_and_Init() */
 
 
@@ -403,11 +404,11 @@ void Set_G_to_Zero(parray,G)
 {
  int i,j;
  double sum[3];
- 
+
  sum[0] = sum[1] = sum[2] = 0.0;
- for (i=0;i<parray->N;++i){ 
+ for (i=0;i<parray->N;++i){
    for (j=0;j<3;++j) sum[j] += parray->pos[i][j];
-  } 
+  }
 
  for (j=0;j<3;++j) G[j] = sum[j]/parray->N;
 
@@ -418,19 +419,19 @@ void Set_G_to_Zero(parray,G)
 
 
 void Rotation(parray,mat)
- struct POS_ARRAY *parray; 
+ struct POS_ARRAY *parray;
  double mat[3][3];
 {
  double p[3],q[3];
  int i;
 
- for (i=0;i<parray->N;++i){ 
-   p[0] = parray->pos[i][0];  
-   p[1] = parray->pos[i][1];  
-   p[2] = parray->pos[i][2];  
+ for (i=0;i<parray->N;++i){
+   p[0] = parray->pos[i][0];
+   p[1] = parray->pos[i][1];
+   p[2] = parray->pos[i][2];
    Mult_Mat_Vec3(q,mat,p);
-   parray->pos[i][0] = q[0]; 
-   parray->pos[i][1] = q[1]; 
+   parray->pos[i][0] = q[0];
+   parray->pos[i][1] = q[1];
    parray->pos[i][2] = q[2];
  }
 
@@ -444,11 +445,11 @@ double Cal_RMS(pA,pB)
 { int i;
   double dx,dy,dz, RM, rms,dd;
 
- RM = 0.0; 
- for (i=0;i<pA->N;++i){ 
-   dx = pA->pos[i][0] - pB->pos[i][0]; 
-   dy = pA->pos[i][1] - pB->pos[i][1]; 
-   dz = pA->pos[i][2] - pB->pos[i][2]; 
+ RM = 0.0;
+ for (i=0;i<pA->N;++i){
+   dx = pA->pos[i][0] - pB->pos[i][0];
+   dy = pA->pos[i][1] - pB->pos[i][1];
+   dz = pA->pos[i][2] - pB->pos[i][2];
    dd = (dx*dx)+(dy*dy)+(dz*dz);
    RM += dd;
   }
@@ -467,12 +468,12 @@ double Cal_RMS_by_rotation_of_pA(pA, pB, R)
  double dx,dy,dz, RM, rms,dd;
  int i,j;
 
- for (i=0;i<pA->N;++i){ 
-   for (j=0;j<3;++j){ posA[j] = pA->pos[i][j];}  
+ for (i=0;i<pA->N;++i){
+   for (j=0;j<3;++j){ posA[j] = pA->pos[i][j];}
    Mult_Mat_Vec3(RposA,R,posA);
-   dx = RposA[0] - pB->pos[i][0]; 
-   dy = RposA[1] - pB->pos[i][1]; 
-   dz = RposA[2] - pB->pos[i][2]; 
+   dx = RposA[0] - pB->pos[i][0];
+   dy = RposA[1] - pB->pos[i][1];
+   dz = RposA[2] - pB->pos[i][2];
    dd = (dx*dx)+(dy*dy)+(dz*dz);
    RM += dd;
  }
@@ -483,7 +484,7 @@ double Cal_RMS_by_rotation_of_pA(pA, pB, R)
 
 
 void Cal_Optimal_Rmatrix_Quaternion(pA,pB,R)
- struct POS_ARRAY *pA,*pB; 
+ struct POS_ARRAY *pA,*pB;
  double R[3][3];
 {
  int i,j,k;
@@ -495,7 +496,7 @@ void Cal_Optimal_Rmatrix_Quaternion(pA,pB,R)
  printf("#int Cal_Optimal_Rmatrix_Quaternion(pA,pB,R)\n");
 */
 
- /**** (1) Make Matrix B  *******/ 
+ /**** (1) Make Matrix B  *******/
  /*
    a = yk+xk
    b = yk-xk
@@ -503,8 +504,8 @@ void Cal_Optimal_Rmatrix_Quaternion(pA,pB,R)
         |b0  0.0 -a2   a1|
         |b1  a2  0.0  -a0|
         |b2 -a1  a0   0.0|
-  
-   Bk = tra[Ak] * Ak 
+
+   Bk = tra[Ak] * Ak
       = |0.0  b0  b1    b2| |0.0 -b0 -b1  -b2|
         |-b0  0.0 a2   -a1| |b0  0.0 -a2   a1|
         |-b1 -a2  0.0   a0| |b1  a2  0.0  -a0|
@@ -517,29 +518,29 @@ void Cal_Optimal_Rmatrix_Quaternion(pA,pB,R)
 
    B = 1/N * \sum_{k}^{N} Bk
 
-*/ 
+*/
 
  for (i=0;i<4;++i)
   for (j=0;j<4;++j) B[i][j] = 0.0;
 
 
  for (k=0;k<pA->N;++k){
- 
+
   for (i=0;i<3;++i) {
-   a[i] = pB->pos[k][i] + pA->pos[k][i];  
-   b[i] = pB->pos[k][i] - pA->pos[k][i]; 
+   a[i] = pB->pos[k][i] + pA->pos[k][i];
+   b[i] = pB->pos[k][i] - pA->pos[k][i];
    aa[i] = a[i]*a[i];
-   bb[i] = b[i]*b[i]; }  
+   bb[i] = b[i]*b[i]; }
 
   B[0][0] += bb[0]+bb[1]+bb[2];
   B[0][1] +=  a[2]*b[1] - a[1]*b[2];
   B[0][2] += -a[2]*b[0] + a[0]*b[2];
   B[0][3] +=  a[1]*b[0] - a[0]*b[1];
-  
+
   B[1][1] += bb[0]+aa[1]+aa[2];
   B[1][2] +=  b[0]*b[1] - a[0]*a[1];
   B[1][3] +=  b[0]*b[2] - a[0]*a[2];
- 
+
   B[2][2] += aa[0]+bb[1]+aa[2];
   B[2][3] +=  b[1]*b[2] - a[1]*a[2];
   B[3][3] += aa[0]+aa[1]+bb[2];
@@ -547,20 +548,20 @@ void Cal_Optimal_Rmatrix_Quaternion(pA,pB,R)
  } /* k */
 
   for (i=0;i<4;++i){
-    for (j=i;j<4;++j){ 
+    for (j=i;j<4;++j){
        B[i][j] /= pA->N;
-       B[j][i] = B[i][j]; 
+       B[j][i] = B[i][j];
     }
   }
 
- /**** (2) Calculate Eigen Value/Vector of Matrix B  *******/ 
- equal_matrix4(E,B); 
+ /**** (2) Calculate Eigen Value/Vector of Matrix B  *******/
+ equal_matrix4(E,B);
  /* print_matrix4(B,"Bmatrix"); */
  Jacobi_Wilkinson4(E,V);
  /* print_matrix4(E,"EigVal"); */
  /* print_matrix4(V,"EigVec"); */
  Find_Minimum_Eigen_Value4(E,V,&min_eval,min_evec);
- 
+
  /**** (3) Calculate Rmat from the eigen vector quaternion ****/
  Cal_Rmatrix_From_Quaternion(R,min_evec);
  /* print_matrix3(R,"Rmat"); */
@@ -605,13 +606,13 @@ void Cal_Rmatrix_From_Quaternion(R,q)
  int i,j;
  double Q[4][4];
 
- for (i=0;i<4;++i) 
-  for (j=i;j<4;++j) Q[i][j] = Q[j][i] = q[i]*q[j]; 
- 
+ for (i=0;i<4;++i)
+  for (j=i;j<4;++j) Q[i][j] = Q[j][i] = q[i]*q[j];
+
  R[0][0] = 2.0*(Q[0][0]+Q[1][1])-1.0;
  R[0][1] = 2.0*(Q[1][2]-Q[0][3]);
  R[0][2] = 2.0*(Q[1][3]+Q[0][2]);
- 
+
  R[1][0] = 2.0*(Q[1][2]+Q[0][3]);
  R[1][1] = 2.0*(Q[0][0]+Q[2][2])-1.0;
  R[1][2] = 2.0*(Q[2][3]-Q[0][1]);
@@ -624,7 +625,7 @@ void Cal_Rmatrix_From_Quaternion(R,q)
  R[0][0] = 1.0-2.0*(Q[2][2]+Q[3][3]);
  R[0][1] = 2.0*(Q[1][2]+Q[0][3]);
  R[0][2] = 2.0*(Q[1][3]-Q[0][2]);
- 
+
  R[1][0] = 2.0*(Q[1][2]-Q[0][3]);
  R[1][1] = 1.0-2.0*(Q[1][1]+Q[3][3]);
  R[1][2] = 2.0*(Q[2][3]+Q[0][1]);
@@ -639,17 +640,17 @@ void Cal_Rmatrix_From_Quaternion(R,q)
 
 
 void Jacobi_Wilkinson4(A,U)
- double A[4][4]; /* Input matrix whose eigen value/vector will be calculated. 
+ double A[4][4]; /* Input matrix whose eigen value/vector will be calculated.
       After calculation, it becomes diagonal matrix of eigen values. */
- double U[4][4]; /* Output matrix corresponding to eigen vectors. 
+ double U[4][4]; /* Output matrix corresponding to eigen vectors.
    Eigen vector corresponds to each "column" vector of matrix U.
-   For example k-th eigen vector 
-   evec_k[0] =  U[0][k]; 
-   evec_k[1] =  U[1][k]; 
-   evec_k[2] =  U[2][k]; 
-   evec_k[3] =  U[3][k]; 
-   */ 
-{ 
+   For example k-th eigen vector
+   evec_k[0] =  U[0][k];
+   evec_k[1] =  U[1][k];
+   evec_k[2] =  U[2][k];
+   evec_k[3] =  U[3][k];
+   */
+{
  double R[4][4],TR[4][4],BUFF[4][4];
  double max,co,si;
  double sa,r,sqrt2;
@@ -658,33 +659,33 @@ void Jacobi_Wilkinson4(A,U)
  sqrt2 = sqrt(2.0);
 
    /* --------SETTING U[][] = I --------*/
-   
+
    for (i=0;i<4;++i)
      for (j=0;j<4;++j) if (i==j) U[i][j] = 1.0;  else U[i][j] = 0.0;
-    
+
     find_max_abs4(&mi,&mj,&max,A);
     c = 0;
-    
+
     while ((max>0.00000001)&&(c<100)){
-      /*--------- SET of cos sin -----------*/ 
-      
-      sa = (A[mi][mi] - A[mj][mj])/2;  
+      /*--------- SET of cos sin -----------*/
+
+      sa = (A[mi][mi] - A[mj][mj])/2;
       r = sqrt(sa*sa + A[mi][mj]*A[mi][mj]);
-      co =  sqrt(1.0+sa/r)/sqrt2;  si =  A[mi][mj]/2.0/r/co; 
-      if (sa>0.0) 
+      co =  sqrt(1.0+sa/r)/sqrt2;  si =  A[mi][mj]/2.0/r/co;
+      if (sa>0.0)
        { co =  sqrt(1.0+sa/r)/sqrt2;  si =  A[mi][mj]/2.0/r/co; }
-      else 
+      else
        { co =   sqrt(1.0-sa/r)/sqrt2; si = - A[mi][mj]/2.0/r/co; }
-      
-      /* -------- SET of Rot Matrix R and TR----- */  
+
+      /* -------- SET of Rot Matrix R and TR----- */
       for (i=0;i<4;++i)
 	for (j=0;j<4;++j) if (i==j)  R[i][j] = 1.0;  else R[i][j] =0.0;
-     
+
        R[mi][mi] =   co; R[mi][mj] = -si;
        R[mj][mi] =   si; R[mj][mj] = co;
 
       for (i=0;i<4;++i)
-	for (j=0;j<4;++j) TR[j][i] = R[i][j]; 
+	for (j=0;j<4;++j) TR[j][i] = R[i][j];
 
        prod_matrix4(BUFF,A,R);
        prod_matrix4(A,TR,BUFF);
@@ -693,7 +694,7 @@ void Jacobi_Wilkinson4(A,U)
 
        find_max_abs4(&mi,&mj,&max,A);
        ++c;
- 
+
       } /* end of while */
 
 }/* end of Jacobi_Wilkinson() */
@@ -712,7 +713,7 @@ void find_max_abs4(mi,mj,max,A) /* Max_Abs element A[mi][mj] = max */
     for (j=0;j<4;++j)
       if (i!=j)
        if (fabs(A[i][j])> *max)
-	      { *max = fabs(A[i][j]);     p = i; q= j;}  
+	      { *max = fabs(A[i][j]);     p = i; q= j;}
    *mi =p; *mj = q;
 } /* end of find_max_abs4() */
 
@@ -740,10 +741,10 @@ void prod_matrix4(C,A,B) /* C = A * B */
 { int i,j,k;
   double sum;
   for (i=0;i<4;++i){
-    for (j=0;j<4;++j){ 
+    for (j=0;j<4;++j){
        sum =0;
        for (k=0;k<4;++k){ sum = sum + A[i][k] * B[k][j];}
-       C[i][j] = sum; 
+       C[i][j] = sum;
      }
   }
 } /* end of prod_matrix4() */
@@ -754,10 +755,10 @@ void prod_matrix3(C,A,B) /* C = A * B */
 { int i,j,k;
   double sum;
   for (i=0;i<3;++i){
-    for (j=0;j<3;++j){ 
+    for (j=0;j<3;++j){
        sum =0;
        for (k=0;k<3;++k){ sum = sum + A[i][k] * B[k][j];}
-       C[i][j] = sum; 
+       C[i][j] = sum;
      }
   }
 } /* end of prod_matrix3() */
@@ -766,10 +767,10 @@ void prod_matrix3(C,A,B) /* C = A * B */
 
 void Mult_Mat_Vec3(y,mat,x)
  double y[3],mat[3][3],x[3];  /* This function is only for 3-D */
-{ 
+{
   y[0] = mat[0][0]*x[0] + mat[0][1]*x[1] + mat[0][2] * x[2];
   y[1] = mat[1][0]*x[0] + mat[1][1]*x[1] + mat[1][2] * x[2];
-  y[2] = mat[2][0]*x[0] + mat[2][1]*x[1] + mat[2][2] * x[2]; 
+  y[2] = mat[2][0]*x[0] + mat[2][1]*x[1] + mat[2][2] * x[2];
 }
 
 
@@ -780,9 +781,9 @@ void print_matrix4(A,comment)
   printf("\n");
   printf("#%s\n",comment);
   for (i=0;i<4;++i){
-    for (j=0;j<4;++j){ 
+    for (j=0;j<4;++j){
       printf(" %8.3lf",A[i][j]);
-      if (j==3){printf(";\n");} else {printf(",");} 
+      if (j==3){printf(";\n");} else {printf(",");}
     }
   }
   printf("\n");
@@ -796,9 +797,9 @@ void print_matrix3(A,comment)
   printf("\n");
   printf("#%s\n",comment);
   for (i=0;i<3;++i){
-    for (j=0;j<3;++j){ 
+    for (j=0;j<3;++j){
       printf(" %8.3lf",A[i][j]);
-      if (j==2){printf(";\n");} else {printf(",");} 
+      if (j==2){printf(";\n");} else {printf(",");}
     }
   }
   printf("\n");
@@ -820,7 +821,7 @@ void calculate_gcenter(mol,gcen)
        gcen[2] += mol->atoms[i].Pos[2];
        N += 1;
     }
-  } 
+  }
   if (N>0){
     gcen[0] /= N; gcen[1] /= N; gcen[2] /= N;
   }
@@ -868,7 +869,7 @@ void make_random_rotmatrix(R)
 {
   double raxis[3], rangle;
   int i;
-  
+
   for (i=0;i<3;++i){ raxis[i] = -1.0 + 2.0*((float)rand())/RAND_MAX; }
   normalize_vec3(raxis);
   rangle  = 2.0 * M_PI * ((float)rand())/RAND_MAX;
@@ -904,7 +905,7 @@ void multiply_by_two_points_axis_random_rotmatrix(R, posA, posB)
   /* (3) R = RposAB * R */
   prod_matrix3(RposAB_R,RposAB,R);
   equal_matrix3(R,RposAB_R);
- 
+
 } /* end of multiply_two_points_axis_random_rotmatrix() */
 
 
@@ -928,7 +929,7 @@ int make_rot_axis_angle_from_rot_matrix(w,R)
   int i,i0,j0,k0;
 
 /*
-  print_matrix3(R,"Rorig"); 
+  print_matrix3(R,"Rorig");
 */
   eps = 0.00000001;
 
@@ -955,7 +956,7 @@ int make_rot_axis_angle_from_rot_matrix(w,R)
 
 /*
     printf("#u0 %lf u1 %lf u2 %lf\n",u[0],u[1],u[2]);
-     printf("#i0 %d j0 %d k0 %d\n",i0,j0,k0); 
+     printf("#i0 %d j0 %d k0 %d\n",i0,j0,k0);
  */
  /* (3) Calculate sin_t from u[i0]  */
   sin_t = (R[k0][j0]-R[j0][k0])/(2.0*u[i0]);
@@ -965,7 +966,7 @@ int make_rot_axis_angle_from_rot_matrix(w,R)
       u[j0] = (R[i0][j0])/(2.0*u[i0]);
       u[k0] = (R[i0][k0])/(2.0*u[i0]);
   }
-  else{ 
+  else{
       u[j0] = (R[i0][k0]-R[k0][i0])/(2.0*sin_t);
       u[k0] = (R[j0][i0]-R[i0][j0])/(2.0*sin_t);
   }
@@ -983,10 +984,10 @@ int make_rot_axis_angle_from_rot_matrix(w,R)
 
   /* (4) Calculate rot angle from cos_t and sin_t  */
   if (cos_t>1.0){
-     w[3] = 0.0; 
+     w[3] = 0.0;
   }
   else if (cos_t< -1.0){
-     w[3] = M_PI; 
+     w[3] = M_PI;
   }
   else{
     w[3] = acos(cos_t);
@@ -1032,7 +1033,7 @@ void make_rot_matrix_from_rot_axis_angle(R,w)
       }
       /* printf("#R[%d][%d] %lf\n",i,j,R[i][j]); */
     }
-  } 
+  }
   /* print_matrix3(R,"R"); */
 } /* end of make_rot_matrix_from_rot_axis_angle() */
 
@@ -1047,12 +1048,12 @@ void make_tvec_from_rmat_gorig_gtra(tvec, R,gorig,gtra)
  /*
    xtra = R * (xorig - gorig) + gtra
         = R * xorig - R* gorig + gtra
-        = R * xorig + tvec 
- 
+        = R * xorig + tvec
+
   Therefore, tvec =  - R* gorig + gtra
  */
   int i;
- 
+
   Mult_Mat_Vec3(tvec,R,gorig);
   for (i=0;i<3;++i){
     tvec[i] = -tvec[i] + gtra[i];

@@ -1,1 +1,0 @@
-gcc propsearch.c -lm -g -Wall -o ../propsearch
