@@ -141,7 +141,7 @@ ALA "Modify descriptor" 2011-06-04 RCSB
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
+#include <string.h>
 #include "molecule.h" 
 #include "globalvar.h" 
 #include "molprop.h" 

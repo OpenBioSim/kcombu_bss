@@ -36,7 +36,7 @@ BOND        5
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
+#include <string.h>
 #include <math.h>
 #include "globalvar.h"
 #include "2DMAP.h" 

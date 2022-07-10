@@ -16,7 +16,7 @@ This software is released under the three-clause BSD License, see LICENSE.txt.
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include <strings.h>
+#include <string.h>
 #include "2DMAP.h"
 #include "molecule.h"
 #include "match.h"

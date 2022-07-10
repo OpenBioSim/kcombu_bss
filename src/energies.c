@@ -17,7 +17,7 @@ functions of energies to transform molecular conformation
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include <strings.h>
+#include <string.h>
 #include "globalvar.h"
 #include "2DMAP.h"
 #include "molecule.h"

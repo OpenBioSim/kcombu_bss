@@ -14,11 +14,17 @@ This software is released under the three-clause BSD License, see LICENSE.txt.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
+#include <string.h>
 #include <math.h>
 #include <time.h>
-#include <sys/time.h>
-#include <dirent.h>
+
+#if defined(_WIN32) || defined(WIN32)
+  #include "windows.h"
+#else
+  #include <sys/time.h>
+  #include <dirent.h>
+#endif
+
 #include "globalvar.h"
 #include "2DMAP.h"
 #include "molecule.h"

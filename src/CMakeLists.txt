@@ -6,6 +6,8 @@ project(KCOMBU_BSS C)
 
 set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS_RELEASE})
 
+add_definitions("-D_USE_MATH_DEFINES")
+
 set(COMMON_SOURCES
     match.c
     io_match.c

@@ -18,7 +18,7 @@ functions for tpdisrest (target-protein distance restraint)
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include <strings.h>
+#include <string.h>
 #include "2DMAP.h"
 #include "molecule.h"
 #include "match.h"

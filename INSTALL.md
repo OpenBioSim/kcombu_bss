@@ -5,7 +5,7 @@
 * A working C compiler, e.g. gcc, clang, MSVC etc.
 * cmake
 
-## Instructions
+## Instructions (Linux and MacOS)
 
 Create a build directory, e.g.
 
@@ -48,3 +48,45 @@ $ cmake --install . --prefix /usr
 ```
 
 would install into `/usr/bin`.
+
+## Instructions (Windows)
+
+In Powershell (or similar) create a build directory, e.g.
+
+```
+$ mkdir build
+```
+
+Change into that build directory, e.g.
+
+```
+$ cd build
+```
+
+Run `cmake`, giving the path to the `src` directory, and specifying a MSVC generator, e.g.
+
+```
+$ cmake ..\src\ -G "Visual Studio 15 2017 Win64"
+```
+
+(use `cmake --help` to see the list of generators, and choose the one that best fits your system)
+
+Compile using `cmake --build` e.g.
+
+```
+$ cmake --build .
+```
+
+Install via
+
+```
+$ cmake --install .
+```
+
+Note that you can set the installation prefix using
+
+```
+$ cmake --install . --prefix C:\kcombu
+```
+
+would install into the `C:\kcombu` directory.

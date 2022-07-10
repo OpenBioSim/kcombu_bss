@@ -18,7 +18,7 @@ the GNU Lesser General Public License (LGPL), see LICENSE.txt.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
+#include <string.h>
 #include "globalvar.h"
 #include "kcombu_io_CIF.h"
 #include "molecule.h"
