@@ -1,0 +1,77 @@
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>
+What is MCS ?
+</title>
+<style>
+PRE {
+background-color : #E0E0E0;
+}
+CODE {
+background-color : #F0F0F0;
+}
+</style>
+
+
+</head>
+<body bgcolor="#FFFFFF" link="#702020" vlink="#202070">
+<CENTER>
+<h3>What is MCS ?</h3>
+</CENTER>
+<hr>
+The Maximum Common Substructure/Subgraph (MCS) is the most popopular 
+concept for generating a one-to-one atom correspondence between two 
+molecules.  A common substructure is defined as a substructure present 
+in two molecules with the same atom types and bond connection. The MCS 
+are defined as the common substructures with the largest number of atoms
+ or bonds. Various types of MCS with different restraints have been 
+proposed so far. Among them, we will explain Connected MCS and 
+Topologically disconnected MCS, and the related concepts, isomorphic 
+structure and substructure.
+<hr>
+<ul>
+<li><b>Isomorphic</b>: Each atom in a molecule must have a corresponding
+ atom in another molecule. Atom types of all of the atoms and connection
+ of all of the atom pairs are identical.
+<center><img src="img/exampISO.png"></center>
+<p>
+</p></li><li><b>Substructure</b>:Molecule A is a part of Molecule B. In 
+the corresponding substructre, atom types and connection of of atom 
+pairs are identical. Typically, the molecule A is assigned as the 'Query
+ molecule'.
+<center><img src="img/exampSUB.png"></center>
+<p>
+</p></li><li><b>C-MCS (Connected MCS)</b>: Maximum common substructure 
+in Molecule A and Molecule B with the same atom types and bond 
+connection. The substructure must be a connected graph, all the atoms 
+belong to one connected component.
+<center><img src="img/exampCMCS.png"></center>
+<p>
+</p></li><li><b>TD-MCS(Topologically constrained disconnected MCS)</b>:Maximum
+ substructure in Molecule A and Molecule B with the same atom types and 
+bond connection.  The substructure can be a disconnected graph, however,
+ the difference in the topological distance between corresponding atom 
+pairs must be theta or less. The topological distance is defined as 
+number of bonds on the shortest path between two atoms.
+<p>
+</p><ul>
+<li>TD-MCS(theta=0): No difference in the topological distance between corresponding atom pairs.
+<center><img src="img/exampTDMCS0.png"></center>
+<p>
+</p></li><li>TD-MCS(theta=1): The difference in the topological distance between corresponding atom pairs must be 1 or 0.
+<center><img src="img/exampTDMCS1.png"></center>
+</li></ul>
+<p>
+</p></li></ul>
+<hr>
+<ul>
+<li>In figures for CMCS/TDMCS, Molecule A is <a href="http://www.genome.jp/dbget-bin/www_bget?dr:D09883" target="_BLANK">Dacomitib (D09883)</a>, Molecule B is <a href="http://www.genome.jp/dbget-bin/www_bget?dr:D01977" target="_BLANK">Gefitinib (D01977)</a>.
+<p>
+</p></li><li>Reference : 
+Kawabata T. Build-up algorithm for atomic correspondence between chemical structures. <i>J.Chem.Info.Model.</i>, <b>2011</b>,<i>51</i>, 1775-1787.
+</li></ul>
+<hr>
+<i>LastModified: Feb 28, 2013</i>
+
+
+</body></html>

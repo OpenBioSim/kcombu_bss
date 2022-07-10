@@ -1,0 +1,104 @@
+CC	      = gcc
+
+CFLAGS	      = -O2 -g -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -Wall
+
+DEST	      = .
+
+EXTHDRS	      =
+
+HDRS	      = \
+
+INSTALL	      = /etc/install
+
+LD	      = gcc
+
+LDFLAGS	      = -O2 -g -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -lm -Wall
+
+LIBS	      = 
+
+MAKEFILE      = Makefile
+
+OBJS	      = dkcombu.o\
+    	        match.o\
+    	        io_match.o\
+    	        buildup.o\
+    	        clique.o\
+    	        c_clique.o\
+    	        MrgSrtMATCH.o\
+    	        MrgSrtLIBMOL.o\
+    	        ioLib.o\
+    	        ioLINE.o\
+    	        2DMAP.o\
+    	        ioSDF.o\
+    	        ioKCF.o\
+    	        ioMOL2.o\
+    	        ioSMILES.o\
+                kcombu_io_CIF.o\
+                MOLECULE_from_CCD_CIF.o\
+    	        stereo_check.o\
+    	        gen2D.o\
+    	        disgeo2D.o\
+    	        qRMS.o\
+    	        2dRMS.o\
+    	        PCAfit.o\
+    	        molprop.o\
+    	        molring.o\
+    	        molpermu.o\
+    	        moltopodis.o\
+    	        AtmPairDesc.o\
+    	        options.o\
+    	        ringblock.o\
+    	        RingDesc.o\
+    	        DualAtmPair.o\
+    	        vector3.o\
+    	        ReadOpt.o\
+	        ioPDB.o
+
+PRINT	      = pr
+
+PROGRAM       = ../dkcombu
+
+SHELL	      = /bin/sh
+
+SRCS	      = dkcombu.c \
+    	        match.c \
+    	        io_match.c \
+    	        buildup.c \
+    	        clique.c \
+    	        c_clique.c \
+    	        MrgSrtMATCH.c \
+    	        MrgSrtLIBMOL.c \
+    	        ioLib.c \
+    	        ioLINE.c \
+    	        2DMAP.c \
+    	        ioSDF.c \
+    	        ioKCF.c \
+    	        ioMOL2.c \
+    	        ioSMILES.c \
+                kcombu_io_CIF.c\
+                MOLECULE_from_CCD_CIF.c\
+    	        stereo_check.c \
+    	        gen2D.c \
+    	        disgeo2D.c \
+    	        qRMS.c \
+    	        2dRMS.c \
+    	        PCAfit.c \
+    	        molprop.c \
+    	        molring.c \
+    	        moltopodis.c \
+    	        molpermu.c \
+    	        AtmPairDesc.c \
+    	        options.c \
+    	        ringblock.c \
+    	        RingDesc.c \
+    	        DualAtmPair.c \
+    	        vector3.c \
+    	        ReadOpt.c \
+	        ioPDB.c
+
+all:		$(PROGRAM)
+
+$(PROGRAM):     $(OBJS) $(LIBS)
+		@echo "Linking $(PROGRAM) ..."
+		@$(LD) $(OBJS) $(LDFLAGS) $(LIBS)  -o $(PROGRAM)
+		@echo "done"

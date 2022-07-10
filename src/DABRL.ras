@@ -1,0 +1,20 @@
+echo ">>DABRL coloring<<"
+echo "Donor    =>blue,  Accepror=>red,       Both=>green"
+echo "aLyphatic=>white, aRomatic=>dark green."
+background white
+set specular true
+select *.CL or *.NL or *.XL or *.SL or *.PL or *.FL  or *.CLL or *.BRL
+color white 
+select *.CR or *.NR
+#color darkgreen 
+#color green 
+color gray 
+select *.ND
+color blue
+select *.OA or *.NA
+color red 
+select *.OB or *.NB
+color purple 
+select hydrogen
+color white
+select all

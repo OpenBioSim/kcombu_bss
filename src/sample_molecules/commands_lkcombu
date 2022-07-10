@@ -1,0 +1,1 @@
+lkcombu -M S -Q 2D_SDF/G39.sdf -idl 2D_SDF -con T -mtd 1 -osc out_lkcombu_G39.sch

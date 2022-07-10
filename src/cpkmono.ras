@@ -1,0 +1,9 @@
+select carbon
+color [224,224,224]
+select nitrogen 
+color [128,128,128]
+select oxygen
+color [32,32,32]
+select ligand
+color black
+wireframe 30

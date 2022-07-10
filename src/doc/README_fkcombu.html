@@ -1,0 +1,396 @@
+<HTML>
+<HEAD>
+<TITLE>
+Instruction for the command 'fkcombu' in the "KCOMBU" program 
+</TITLE>
+<style>
+PRE { 
+background-color : #E0E0E0;
+}
+CODE { 
+background-color : #F0F0F0;
+}
+</style>
+
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" LINK="#702020" VLINK="#202070">
+<CENTER>
+<H2>
+Instruction for the command 'fkcombu' in the "KCOMBU" program 
+</H2>
+</CENTER>
+
+<CENTER>
+2019/05/31<BR>
+Takeshi Kawabata <BR>
+(kawabata@protein.osaka-u.ac.jp) <BR>
+
+Laboratory of Protein Informatics <BR>
+Institute for Protein Research, Osaka University<BR>
+</CENTER>
+<P>
+[Reference for KCOMBU]<BR>
+<UL>
+<LI>Kawabata T.  Build-up algorithm for atomic correspondence between chemical structure. 
+<I>J.Chem.Info.Model.</I>, <B>2011</B>, <I>51</I>, 1775-1787.
+<BR>
+<LI>Kawabata T., Nakamura H. Similarity-based docking using 2D maximum common substructure:
+dependence of prediction accuracy on target-reference chemical similarity.
+<I>J.Chem.Info.Model.</I>, <B>2014</B>, <I>54</I>, 1850-1863.
+</UL>
+<BR>
+
+<P>
+
+
+<HR>
+<H3>Installation</H3> <P>
+The source code of the kcombu is mainly written in C, and developed and executed
+the linux environment.  
+Some additional programs for 2D graphics and statistical analyses are written in python.
+For the installation, you need the gcc compiler.
+If you want to use another compipler, please change the "<CODE>Makefile</CODE>" in the "<CODE>src</CODE>" directory.
+The standard installation procedures are as follows:
+ <P>
+ <OL>
+   <LI> download the file "kcombu-src-[date].tar.gz" file.
+
+   <LI> <PRE>tar zxvf kcombu-src-[date].tar.gz</PRE>
+
+   <LI> <PRE>cd src</PRE>
+   <LI> <PRE>make -f Makefile.fkcombu</PRE>
+ </OL>
+ <P>
+
+
+If the sources is successfully compiled, an execution file 
+"<CODE>fkcombu</CODE>" will appear in the "<CODE>../src</CODE>" directory.
+
+<P>
+<HR>
+<A NAME="fkcombu">
+<H3>'fkcombu' :  for flexible transforming of a target molecule onto a reference molecule</H3><P>
+
+The program <I>fkcombu</I> flexibly superimpose the target molecule onto the reference molecule.
+The <I>fkcombu</I> program uses the terms "<I>target</I>" and "<I>reference</I>"  in following definitions:
+<UL> 
+<LI><I>target</I>   : a compound, whose 3D conformation will be predicted by <I>fkcombu</I>.
+<P>
+<LI><I>reference</I>: a compound, whose 3D conformation in binding state was known by experiment.  
+</UL>
+We assume that 3D confomrations of both reference and target molecules are available as the inputs: 
+the 3D conformation of the reference should be experimentally determined, 
+whereas that of target molecule is provided by a conformer generating program.
+The use of 3D conformation of the receptor protein is optional.
+3D structure of the target molecule can be predicted by superimposing
+and deforming the atoms of target molecule onto that of the tamplate molecule.
+During the tranforming, bond lengths and bond angles of the target are kept as that of its initial conformation.
+Therefore, not only a good 3D conformation of the reference, but also <U>a good 3D initial conformation of the target 
+is necessary for the <I>fkcombu</I> program.</U> The program 'fkcombu' mainly uses atomic correspondences obtained by 2D-maximum common substructure (MCS).
+The target molecule is transformed to superimpose each target atom onto its corresponding reference atom.
+The details of the calculation of MCS is described in 
+<A HREF="README_pkcombu.html" TARGET=_BLANK>README_pkcombu.html</A> and
+<A HREF="README_mcs.html" TARGET=_BLANK>README_mcs.html</A>.
+<HR>
+<H3>Simple Usage</H3> <P>
+<UL>
+<LI>Transforming of the target molecule onto the reference 
+<PRE>  $fkcombu -T [target molecule] -R [reference molecule] -opdbT [output target in PDB]</PRE>
+<LI>Transforming of the target molecule onto the reference using TD-MCS1.
+<PRE>  $fkcombu -T [target molecule] -R [reference molecule] -opdbT [output target in PDB] -con T -mtd 1 </PRE>
+<LI>Transforming of the target molecule onto the reference avoiding the receptor.
+<PRE>  $fkcombu -T [target molecule] -R [reference molecule] -P [receptor molecule] -opdbT [output target in PDB]</PRE>
+<LI>Assigning higher number of '-nini' (number of initial conformations) leads to a lower energy with a larger computation.
+<PRE> $fkcombu -nini 20 -T [target molecule] -R [reference molecule] -P [receptor molecule] -opdbT [output target in PDB]</PRE>
+<LI>Transforming of the target molecule onto the reference with volume-overlap by rigid fitting
+<PRE>  $fkcombu -T [target molecule] -R [reference molecule] -opdbT [output target in PDB] -E V -S R</PRE>
+<LI>Transforming of the target molecule onto the reference with volume-overlap by flexible fitting
+<PRE>  $fkcombu -T [target molecule] -R [reference molecule] -opdbT [output target in PDB] -E V -S F </PRE>
+<LI>for showing options in detail
+<PRE>  $fkcombu -h </PRE>
+<LI>for showing options for MCS
+<PRE>  $fkcombu -hmcs</PRE>
+</UL>
+<P>
+<HR>
+<H3>Procedures for transforming</H3>
+The procedures of program 'fkcombu' consists of following several steps:
+<P>
+<UL>
+<LI><U>[1] Finding one-to-one atomic correspondence</U>:<P>
+The details of the calculation of MCS and its options are described in 
+<A HREF="README_pkcombu.html" TARGET=_BLANK>README_pkcombu.html</A> and
+<A HREF="README_mcs.html" TARGET=_BLANK>README_mcs.html</A>.
+The default setting is Connected MCS (<code> -con C </code>).
+For dissimilar compound pairs, we recommended TD-MCS (<code>-con T -mtd 1</code>).
+
+<P>
+<LI><U>[2]Transform target molecule by stamping</U>:
+<P>
+Executions of the stamping process can be assigned by the options 
+<CODE>-rgmch</CODE>, <CODE>-cfstp</CODE>, <CODE>-rgpca</CODE>, and <CODE>-cfstprng</CODE>.
+<UL>
+ <LI><CODE>-rgmch</CODE>: rigid-body rmsd-min rigid-body fitting of matched atoms bwn molT and molR (T or F) [T]
+ <LI><CODE>-cfstp</CODE>: Conformational Change by stamping rotatable bond into molT from molR (T or F) [T]
+ <LI><CODE>-cfesc</CODE>: Conformational Change by minimize using only Eselfclash (recommend for volume-flexible fitting) [F]
+ <LI><CODE>-cfstprng</CODE>: Stamp nonplanar 5- or 6-ring conformations (T or F) [T]
+ <LI><CODE>-rgpca</CODE>   : rigid-body PCA-Evolmovlap fitting (T or F) [F]
+</UL>
+
+
+<P>
+<LI><U>[3]Transform target molecule by Gradient-based steepest descent method</U>:
+<P>
+A steepest descent minimization of an potential energy is performed for initial random configurations 
+generated by changing torsion angles randomly, which are not determined by stamping processes.
+A execution of the stamping process can be assigned by the option <CODE>-SD</CODE>, 
+<UL>
+<LI<CODE>-SD</CODE>: Gradient-based Steepest Descent fitting (T or F) [T]
+</UL>
+<P>
+Number of random initial configuration is assigned by the option <code>-nini</code>.
+
+
+Four potential energy functions are employed; <I>Eatommatch</I>, <I>Eselfclash</I>, <I>Ercptclash</I> and <I>Evolmovlap</I>.
+<UL>
+<LI TYPE=circle><I>Eatommatch</I>: an energy for superimposing 3D postions of MCS-corresponding atoms.
+<LI TYPE=circle><I>Eselfclash</I>: an energy for penelizing atomic clashes between two atoms in the target molecule.
+<LI TYPE=circle><I>Eprotclash</I>: an energy for penelizing atomic clashes between an atom in the target molecule and an atom in the receptor protein. This is optional, only works when the receptor 
+protein (<code>-P</code> option) is assigned.
+<LI TYPE=circle><I>Eprotatrct</I>: an energy for attraction between an atom in the target molecule and an atom in the receptor protein. This is optional, only works when the receptor 
+protein (<code>-P</code> option) is assigned.  The weight <code>-wepa</code> should be less than the weight <code>-wepc</code>.
+
+<LI TYPE=circle><I>Evolmovlap</I>: an energy for non-specifict superimposing 3D positions of atoms using Gaussian distribution functions. This is optional.
+<LI TYPE=circle><I>Etpdisrest</I>: an energy for the Upper-distance restraint between the specified target atom and the specified protein atom. This is optional. The restraint atom pairs and upper distance
+is assigned by <CODE>-tppair</CODE> option.
+</UL>
+<P>
+Weights for these energies can be assigned by options <CODE>-weam</CODE>, <CODE>-wesc</CODE>, <CODE>-wepc</CODE>, <CODE>-wepa</CODE>, <CODE>-wevo</CODE>, and <CODE>-wetp</CODE>.
+</UL>
+
+<HR>
+<H3>Options</H3>
+<UL>
+
+<LI>Strategy options
+<P>
+Because options of transforming procedures and energy functions are complicated, we prepare two simple options 
+<code>-E</code> and <code>-S</code> for controlling the details of transformation.
+<PRE>
+<options for general stargety of transformation>
+ -E  : Energy. 'A'tom-match, 'V'olume-overlap,         'X':by detailed options.[A]
+ -S  : Search. 'F'lexible,'R'igid,      'N':do nothing 'X':by detailed options [F]
+</PRE>
+
+Relationships between the strategy options and other options are summarized as
+the following table:
+<CENTER>
+<TABLE BORDER="1">
+<TR>
+<TD COLSPAN="2">Strategy</TD>
+<TD COLSPAN="11">Automatically assigned options</TD>
+</TR>
+
+<TR>
+<TD>Description</TD>
+<TD>Options</TD>
+<TD><CODE>-rgdflx</CODE></TD>
+<TD><CODE>-mcs</CODE></TD>
+<TD><CODE>-cfstp</CODE></TD>
+<TD><CODE>-cfesc</CODE></TD>
+<TD><CODE>-rgmch</CODE></TD>
+<TD><CODE>-rgpca</CODE></TD>
+<TD><CODE>-SD</CODE></TD>
+<TD><CODE>-cfrnd</CODE></TD>
+<TD><CODE>-rgrnd</CODE></TD>
+<TD><CODE>-weam</CODE></TD>
+<TD><CODE>-wevo</CODE></TD>
+</TR>
+
+<TR>
+<TD>Atom-match, Flexible</TD>
+<TD>-E A -S F</TD>
+<TD>F</TD>
+<TD>T</TD>
+<TD>T</TD>
+<TD> </TD>
+<TD>T</TD>
+<TD> </TD>
+<TD>T</TD>
+<TD>T</TD>
+<TD> </TD>
+<TD>1</TD>
+<TD>0</TD>
+</TR>
+
+<TR>
+<TD>Atom-match, Rigid</TD>
+<TD>-E A -S R</TD>
+<TD>R</TD>
+<TD>T</TD>
+<TD> </TD>
+<TD> </TD>
+<TD>T</TD>
+<TD> </TD>
+<TD>T</TD>
+<TD> </TD>
+<TD> </TD>
+<TD>1</TD>
+<TD>0</TD>
+</TR>
+
+
+<TR>
+<TD>Volume-overlap, Flexible</TD>
+<TD>-E V -S F</TD>
+<TD>F</TD>
+<TD> </TD>
+<TD> </TD>
+<TD>T</TD>
+<TD> </TD>
+<TD>T</TD>
+<TD>T</TD>
+<TD>T</TD>
+<TD>T</TD>
+<TD>0</TD>
+<TD>1</TD>
+</TR>
+
+<TR>
+<TD>Volume-overlap, Rigid</TD>
+<TD>-E V -S R</TD>
+<TD>R</TD>
+<TD> </TD>
+<TD>T</TD>
+<TD> </TD>
+<TD> </TD>
+<TD>T</TD>
+<TD>T</TD>
+<TD> </TD>
+<TD>T</TD>
+<TD>0</TD>
+<TD>1</TD>
+</TR>
+
+</TABLE>
+</CENTER>
+
+<P>
+<LI>Input options for 'fkcombu'<P>
+
+ Input options for 'fkcombu' are similar to those of <A HREF="README_pkcombu.html">'pkcombu' program</A>.
+
+<PRE>
+< input options for 'fkcombu'>
+ -T   : target    molecule T (molT)(*.sdf|*.mol2|*.pdb|*.kcf)[]
+ -R   : reference molecule R (molR)(*.sdf|*.mol2|*.pdb|*.kcf)[]
+ -P   : protein   receptor P (molP)(*.sdf|*.mol2|*.pdb|*.kcf)[]
+ -fT, -fR, -fP : file formats.'P'db,'S'df,'K'cf, '2':MOL2 [---]
+ -aT, -aR, -aP : AtomHetero types. 'A'tom 'H'etatm 'B'oth for PDB[BBA]
+ -chT,-chR,-chP: ChainIDs for PDB [---]
+</PRE>
+
+<LI>Options for transformation procedures<P>
+<PRE>
+ -mcs     : Do MCS. ('T' or 'F'). If 'F', do not use any atom match [T]
+ -SD      : Gradient-based Steepest Descent fitting (T or F) [T]
+ -rgdflx  : Rigid or Flexible.  R'igid-body(do not set up rotational bond),'F':lexible (set up rotational bond) [F]
+ -cfstp   : Conformational Change by stamping rotatable bond into molT from molR (T or F) [T]
+ -cfesc   : Conformational Change by minimize using only Eselfclash (recommend for volume-flexible fitting) [F]
+ -cfstprng: Stamp nonplanar 5- or 6-ring conformations (T or F) [T]
+ -rgmch   : rigid-body rmsd-min rigid-body fitting of matched atoms bwn molT and molR (T or F) [T]
+ -rgpca   : rigid-body PCA-Evolmovlap fitting (T or F) [F]
+</PRE>
+<LI> Output options for transformed molecular file
+<PRE>
+ -KV      : key-value-style stdout. (T or F)[T]
+ -nout    : num. of output conformations [1]
+ -opdbT   : output PDB file  for molT []
+ -osdfT   : output SDF file  for molT []
+ -omol2T  : output MOL2 file for molT []
+ -opdbTR  : output PDB file  for rotated molT and fixed molR[]
+ -opdbTRP : output PDB file  for rotated molT and fixed molR and receptor protein[]
+ -nameT   : new name for molecule A []
+ -newresT : new residue name for molT ([resi_name]:[chain]:[resi_number]) for PDB output[: :]
+</PRE>
+
+<LI> Options for transformations
+<PRE>
+ -chsp3  : Chilarity fit for sp3  atoms (T or F) [F]
+ -ste2D  : chirarity change for adjusting stereo parities of    molR 2D SDF file(T or F)[F]
+ -hyop   : Hydrogen-position optimize (T or F)[T]
+</PRE>
+<P>
+<LI> Options about multiple types of MCS atom matches
+<PRE>
+ -mcs[x] : for [x]-th type for multiple MCS matches (x=0,1,2,..). [con]:[mtd]:[at]:                                           
+           ex) -mcs0 C:-1:K -mcs1 T:1:E -mcs2 T:1:K                                                                           
+ -mxam   : maximum number of atom matches for the 3D-modelling [1]                                                            
+ -sort : sort value for multiple target 3D models. 'E':Etotal, 'V':tanimoto_volume [E]
+</PRE>
+<P>
+
+<LI>Detailed options for gradient optimization
+<PRE>
+ -nini  : num. of random initial conformatinon. (nini==1, only keep the input conf). [10]
+ -nout  : num. of output conformations [1]
+ -xroini: initial maximum step for rotational bond (degree) [180.000000]
+ -iro   : initial maximum step for rotation        (degree) [180.000000]
+ -ich   : initial chirarity change ('T' or 'F') [F]
+ -pflp  : probabality of flip ring fragment for initial conf(0.0..1.0). [0.000000]
+ -nc10  : if smallest Nselfclash > [nc10], then [nini] x= 10. [-1]
+ -xtr   : maximum step for translation     for optimization(angstrom)  [0.100000]
+ -xro   : maximum step for rotation        for optimization(degree)    [10.000000]
+ -xrb   : maximum step for rotational bond for optimization (degree)[10.000000]
+ -nig   : Number of iteration for gradient-based fitting [100]
+ -weam  : Weight for Eatommatch [1.000000]
+ -wesc  : Weight for Eselfclash [1.000000]
+ -wepc  : Weight for Eprotclash [1.000000]
+ -wepa  : Weight for Eprotatrct [0.000000]
+ -wevo  : Weight for Evolmovlap [0.000000]
+ -wetp  : Weight for Etpdisrest [0.000000]
+ -tolc  : tolerant distance for clash [1.000000]
+ -dxc   : maximum distance for clash energy [6.000000]
+ -fixstp: fixing rule for stamped bond for steepest descent initials. 'F':fix. 'R'otatable. [R]
+ -fixpln: fixing rule for plane   bond for steepest descent initials. 'F':fix. 'I'nversion(allow 180 degree rotation). 'R'otatable.[I]
+ -pvo   : parameter p for Evolmovlap [2.828427]
+ -avo   : atom match type for Evolmovlap. 'I'gnore,'C'are [I]
+ -tppair[x]: [x]-th target-protein atom pairs for Etpdisrest. (Tarom_num):(Patom_num):(Dupper) [x] is 0 or 1 or 2. []
+</PRE>
+<LI> options for stereo parity adjusting '-ste T' 
+<PRE>
+ -pyrd : Do pyramid inversion for stereo-parity agreement (-ste) (T or F). [T]
+ -arflt: Do all-atom reflection when Nchiral_disagree_impossible > 0 (T or F) [T]
+ -fhxrg: fold hexa-ring with 2-disagree atoms (T or F)[T]
+ -miflp: minimum angle for flip of fragment for -pflp>0.0. [10.000000]
+</PRE>
+
+
+<LI>Options for calculating MCS<P>
+ Input options for calculating MCS is the same as that of <A HREF="README_pkcombu.html">'pkcombu' program</A>.
+<PRE>
+-alg : Algorithm. 'B'uild-up, 'X':eXact,'P'ca-3D-fit '3'D(raw_fit) 'F':from file (-iam option).[B]
+-iam    : input file for atom matching []
+</PRE>
+<U>User-defined atom matching</U> can be used for <I>fkcombu</I> program.
+File format of atom matching is described in <A HREF="README_pkcombu.html#format_atom_match_minimum">README_pkcombu.html</A>.
+<BR>
+A following command generates the transformed target molecule by the user-defined atom matching file assgined by (<code>-iam</code>).
+<PRE>
+fkcombu -T [target_molecule_file] -R [reference_molecule_file] -alg F -iam [atom_matching_file]
+</PRE>
+If you use the option (<code>-alg B</code>) as follows, the <I>fkcombu</I> tries to add more atom mathing to the user-defined matching
+using the build-up algorithm. The user-defined matching is used as the initial matching of the build-up.
+<PRE>
+fkcombu -T [target_molecule_file] -R [reference_molecule_file] -alg B -iam [atom_matching_file]
+</PRE>
+When you use the option <code>-alg B</code> with <code>-iam</code>, the user-defined matching should be satisfied the condition of
+MCS. Check the other options of MCS, such as <code>-at</code>,<code>-con</code>, and <code>-mtd</code>, described in
+<A HREF="README_pkcombu.html">README_pkcombu.html</A>.
+
+
+</UL>
+
+
+</BODY>
+</HTML>

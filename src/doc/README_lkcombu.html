@@ -1,0 +1,373 @@
+<HTML>
+<HEAD>
+<TITLE>
+Instruction for the command 'lkcombu' in the "KCOMBU" program
+</TITLE>
+<style>
+PRE {
+background-color : #E0E0E0;
+}
+CODE {
+background-color : #F0F0F0;
+}
+</style>
+</HEAD>
+<BODY>
+
+<CENTER>
+<H2>
+Instruction for the command 'lkcombu' in the "KCOMBU" program
+</H2>
+</CENTER>
+
+<CENTER>
+Jan 6, 2014<BR>
+Takeshi Kawabata <BR>
+(kawabata@protein.osaka-u.ac.jp) <BR>
+
+Laboratory of Protein Informatics <BR>
+Institute for Protein Research, Osaka University<BR>
+</CENTER>
+<P>
+[Reference for KCOMBU]<BR>
+Kawabata T.  Build-up algorithm for atomic correspondence between chemical structure. 
+<I>J.Chem.Info.Model.</I>, <B>2011</B>, <I>51</I>, 1775-1787.
+<P>
+<HR>
+The program '<I>lkcombu</I>' is chemical structure comparison using compound library.
+<HR>
+<H2>Installation</H2> <P>
+The source code of the kcombu is mainly written in C, and developed and executed
+the linux environment.
+Some additional programs for 2D graphics and statistical analyses are written in python.
+For the installation, you need the gcc compiler.
+If you want to use another compipler, please change the "Makefile" in the "src" directory.
+The standard installation procedures are as follows:
+ <P>
+ <OL>
+   <LI> download the file "kcombu-src-[date].tar.gz" file.
+
+   <LI> <PRE>tar zxvf kcombu-src-[date].tar.gz</PRE>
+
+   <LI> <PRE>cd src</PRE>
+   <LI> <PRE>make -f Makefile.lkcombu</PRE>
+ </OL>
+ <P>
+
+
+If the sources is successfully compiled,  an execution file 
+"lkcombu" will appear in the "../src" directory.
+
+<P>
+<HR>
+
+<P>  
+
+<UL>
+<LI> Simple usage of 'lkcombu'<P>
+
+The program 'lkcombu' has two main modes for calculation: query-library search ("-M S")
+and all-vs-all comparison("-M A").  The simplest usages are summarized as follows:
+
+<PRE>
+>for query-library search
+  $lkcombu -M S -Q [query_mol] -ifl  [files of lib multi mols] -fL [S|P|2] -osc [output_file]
+  $lkcombu -M S -Q [query_mol] -idl  [dir   of lib mols]       -fL [S|P|2] -osc [output_file]
+  $lkcombu -M S -Q [query_mol] -idml [dir   of lib multi mols] -fL [S|P|2] -osc [output_file]
+>for all-vs-all comparison
+  $lkcombu -M A -ifl  [file of lib. multi mols] -fL [S|P|2] -osm [output_file]
+  $lkcombu -M A -idl  [dir of lib. mols]        -fL [S|P|2] -osm [output_file]
+  $lkcombu -M A -idml [dir of lib. multi mols]  -fL [S|P|2] -osm [output_file]
+ (-fL : file formats.'P'db,'S'df,'K'cf, '2':MOL2)
+>for comparison bwn two groups 
+  $lkcombu -M G -idlq [dir of query lib. mols] -idl [dir of lib mols] -fQ [S|P|2] -fL [S|P|2] -osm [output_file]
+>for randomly selecting library
+  $lkcombu -M R -idl [dir of lib. mols] -nlr [num_select_mol] -tam [threMCS] -oms [out_multi_mol] -omsd [out_mol_dir]
+>for showing options in detail
+  $lkcombu -h
+>for showing options for MCS
+  $lkcombu -hmcs
+</PRE>
+
+<LI> Options for Input Library (for "-M S" and "-M A") <P> 
+
+Both modes ("-M S" and "-M A") requires library molecular files, which can be specified by the following options:
+
+
+<PRE>
+<options for input library>
+ -ifl : input files for all the library molecules (file1:file2:..) []
+ -idl : input directory for library molecules   [.]
+ -ill : input list of library molecules[]
+ -ihl : required header string of input file (combined with -idl option) []
+ -fL  : file formats.'P'db,'S'df,'K'cf, '2':MOL2 [-]
+ -aL  : AtomHetero type. 'A'tom 'H'etatm 'B'oth[B]
+</PRE>
+
+We prepare two ways to specify a molecular library.
+<OL>
+<LI> Library molecules are stored in multiple molecular files (multi SDF, multi MOL2, multi PDB file).
+<PRE>
+  -ifl [multi SDF file]  -fL [S]
+  -ifl [multi PDB file]  -fL [P]
+  -ifl [multi MOL2 file] -fL [2]
+</PRE>
+  Multiple library files can be acceptable by spliting colon symbols ':' : 
+<PRE>
+  -ifl [file1]:[file2]:[file3]
+</PRE>
+
+<LI> All the library molecules are stored under a directory; one file for one molecule.
+If you use a following option, the lkcombu read all the files under the directory specified by '-idl' option.
+<PRE>  
+  -idl [directory_for_library_molecule] 
+</PRE>  
+</OL>
+
+<P>
+<LI> Options for Library Search (for "-M S")
+<PRE>
+<options for 'lkcombu -M S':inputing query molecule>
+ -Q   : query molecule Q (*.sdf|*.mol2|*.pdb|*.kcf|*.smi)[]
+ -fQ  : file formats.'P'db,'S'df,'K'cf, '2':MOL2,'M':SMILES [-]
+ -aQ  : AtomHetero type. 'A'tom 'H'etatm 'B'oth[B]
+</PRE> 
+The program "lkcombu" can read several file formats of chemical structures: sdf, mol2, pdb, kcf and smi.  
+The file format is distinguished by file exetentions : *.sdf -> SDF, *.mol2 ->MOL2, *.pdb -> PDB, *.kcf -> KCF, *.smi ->SMILES.
+For molecular files without proper file extensions, users should directly assign the format types 
+by the option '-fQ'.  For example, if a file "hoge" is for query  and in SDF format, users should add the option 
+"-Q hoge -fQ S".
+
+<PRE> 
+ -tao : Tanimoto threshold value for one atom descriptor (filtering) [0.000000]
+ -tam : Tanimoto threshold value for MCS (output)                 [0.000000]
+ -osc : output search result file   [sch.out]
+</PRE>
+
+The options "-tao" and "-tam" specify the theshold tanimoto similarity score for the search.
+The option "-tao" is more important. 
+The option "-tao" specifies threshold tanimoto values for one atom descriptor, in other words, molecular formula.
+If a user specifies high value for this threshold (such as "-tao 0.9"), the program quickly throws away
+most of library molecules without calculating their MCSs.  The option "-tam" specifies threshold tanimoto values for
+MCS; library molecule with more than "-tam" score are finally listed.
+
+The option "-osc" specifies the output file name of library search.  The default file name is "sch.out".
+Its file format is described in <A HREF="#FormatLibrarySearch"> the last section </A>.
+
+<P>
+<LI>Options for all-vs-all comparison (for "-M A") and two-group comparison (for "-M G")<P>
+
+For the all-vs-all comparison ("-M A") and the two-group comparison,
+we prepare four types of output files as follows:
+<PRE>
+<options for '-M A' and '-M G'>
+ -osm : output file for similarities  [sim.out]
+ -fsm : file formats for osm. 'L':simple pairwise list.'N':list with molecular names
+      :                       'D':distance matrix.  'S'imilarity matrix [N]
+</PRE>
+Their file formats are  described in <A HREF="#FormatAllvsallComparison"> the last section </A>.
+<P>
+
+The threshold score options -tao and -tam also work for the '-M A' and '-M G'.
+If you want focus on only similar molecular pairs ,for example,with tanimoto similarity > 0.5,
+adding the option '-tao 0.5' largely reduces your computation time.
+<PRE>
+ -tao : Tanimoto threshold value for one atom descriptor (filtering) [0.000000]
+ -tam : Tanimoto threshold value for MCS (output)                 [0.000000]
+</PRE>
+
+<P>
+The all-vs-all comparison requires a large computation time, proportional to squares of number of library molecules.
+If you compare more than 1000 molecules, I recommend to use multiple CPU cores for the all-vs-all comparison,
+using '-div' options.
+
+<PRE>
+ -div : Job division. {0..Ndivision-1}/(Ndivision). [0/1]
+</PRE>
+
+For example, if you calcualte the all-vs-all comparison using 4 CPU cores, following four commands should be executed:
+<PRE>
+lkcombu -M A -ifl [libfile] -div 0/4 -osm 0.out &
+lkcombu -M A -ifl [libfile] -div 1/4 -osm 1.out &
+lkcombu -M A -ifl [libfile] -div 2/4 -osm 2.out &
+lkcombu -M A -ifl [libfile] -div 3/4 -osm 3.out &
+</PRE>
+After finishing the calculation, you can get the all-vs-all comparison file just by 
+merging these four file (cat 0.out 1.out 2.out 3.out > all.out).
+Please note that the option '-osl' for output file should be used when the '-div' option is employed.
+The option '-odm' and '-osm' will generate imcomplete file (parts of scores are zero) using the '-div' option. 
+
+<P>
+<LI>Options for calculatinng MCS  <P>
+The options for calculating MCS are identical for those for <I>pkcombu</I>. See the <A HREF="README_pkcombu.html">README_pkcombu.html</A>
+for the MCS options.
+
+</UL>
+
+<HR>
+<H2>Format of the file generated by lkcombu program</H2>
+<UL>
+<A NAME="FormatLibrarySearch">
+<LI><H3>Library Search file</H3><P>
+The result file library search ("-osc") is mainly composed of two parts:
+[SIMILAR_MOLECULAR_LIST] and [ATOM_MATCHING].
+The part [SIMILAR_MOLECULAR_LIST] is the list of similar molecules with score (MCS and Descriptor),
+number of matched atom pairs, number of heavy atoms, heuristic selection score and molecular formula.
+The part [ATOM_MATCHING] is the list of atom number pairs, where the program made atomic correspondences.
+A following file is a result of searching for the query molecule G39.sdf(tamiflu) against the molecules
+stored under the directory '/DB/LIGAND-EXPO/SDF2d' using the tanimoto descriptor score threshold = 0.6, by TD-MCS1:
+
+<PRE>
+#COMMAND lkcombu -M S -Q G39.sdf -idl /DB/LIGAND-EXPO/SDF2d -con T -mtd 1 -tao 0.6 -tam 0.6 -osc G39.sch
+#DATE_START Jan 31,2012 15:12:12
+#DATE_END   Jan 31,2012 15:12:40
+#COMP_TIME  27.547554 seconds
+#QUERY_FILENAME    G39.sdf
+#QUERY_NAME        /DB/LIGAND-EXPO/SDF/G39
+#QUERY_FILETYPE    S
+#QUERY_MOLFORMULA  C14_N2_O4
+#QUERY_NATOM       20
+#QUERY_NHEAVYATOM  20
+#ALGORITHM            B
+#CONNECT_GRAPH        T
+#MAX_DIF_TOPODIS      1
+#THRE_TANIMOTO_MCS      0.600000
+#THRE_TANIMOTO_ATOMPAIR -1.000000
+#THRE_TANIMOTO_ONEATOM  0.600000
+#LIBRARY_DIRECTORY  /DB/LIGAND-EXPO/SDF2d
+#LIBRARY_DESCRIPTOR 
+#NMOL_IN_LIBRARY   13582
+#NMOL_OVER_THRE    19
+#N_LIBRARY_FILE 0
+[SIMILAR_MOLECULE_LIST]
+#[rank(1)] [molecular_num(2)] [file_num(3)] [file_offset(4)] [molecular_name(5)]
+#[similarity MCS(6)] [similarity ONEATOM(7)] [similarity ATOMPAIR(8)]
+#[Natompair(9)] [Nheavyatom(10)] [select_dis(11)] [molecular formula(12)]
+#                                                                [element_for_query]:COOCCCCNCOCCCOCCCCCN
+#                                                                   [ring_for_query]:   aaaa    aa       
+#                                                            [atom_number_for_query]:         11111111112
+#                                                                                   :12345678901234567890
+#[rk][num][name]          [sMCS][sONE][sPAIR][Npair][Nhvyatm][seldis][molform]      :--------------------
+1    9347  0 0 G39        1.000 1.000 0.000  20  20    0.000 C14_N2_O4               COOCCCCNCOCCCOCCCCCN
+2    5358  0 0 FDI        0.783 0.783 0.000  18  21   31.000 C15_N2_O4               COOCCCCNCOCCC-CCCCC-
+3    339   0 0 G28        0.708 0.783 0.000  17  21   14.000 C13_N3_O5               COOCCCCNCOCC---CCCCN
+4    8973  0 0 ST3        0.700 0.700 0.000  14  14   16.000 C9_N2_O3                COOCCCCNCOCCC------N
+5    6283  0 0 HTM        0.696 0.696 0.000  16  19   19.000 C11_N_O7                COOCCCCNCOCC-OC-CC--
+6    2501  0 0 IEM        0.696 0.773 0.000  16  19   18.000 C12_N_O6                COOCCCCNCOCC-OCC--C-
+7    13532 0 0 DYM        0.667 0.667 0.000  16  20   22.000 C11_N_O8                COOCCCCNCOCC-OCC--C-
+8    1534  0 0 ST2        0.667 0.667 0.000  14  15    7.000 C9_N2_O4                COOCCCCNCOCCC------N
+9    4030  0 0 ST5        0.652 0.652 0.000  15  18   21.000 C11_N2_O5               COOCCCCNCOCCC-C-C---
+10   355   0 0 ST6        0.652 0.727 0.000  15  18   21.000 C11_N3_O4               COOCCCCNCOCCC-C-C---
+11   6386  0 0 TYZ        0.650 0.650 0.000  13  13   27.000 C9_N_O3                 COOCCCCNCOCCC-------
+12   12195 0 0 MMR        0.625 0.773 0.000  15  19   26.000 C12_N_O6                C-OC-CCNCOCCCOCCC---
+13   10041 0 0 TNY        0.615 0.750 0.000  16  22   42.000 C12_N2_O8               C-OCCCCNCOCC-OCCC-C-
+14   3403  0 0 0AI        0.609 0.609 0.000  14  17   34.000 C9_N_O7                 COOCCCCNCOCC-OC-----
+15   10566 0 0 ST4        0.609 0.682 0.000  14  17   21.000 C10_N4_O3               COOCCCCNCOCCC-C-----
+16   10077 0 0 49A        0.600 0.667 0.000  15  20   12.000 C11_N3_O6               COOCCCCNCOCC--C-C--N
+17   12296 0 0 4AM        0.600 0.667 0.000  15  20   12.000 C11_N2_O7               COOCCCCNCOCC--C-C--N
+18   5794  0 0 AMU        0.600 0.667 0.000  15  20   30.000 C11_N_O8                C-OC-CCNCOCCCOCCC---
+19   666   0 0 MUB        0.600 0.667 0.000  15  20   30.000 C11_N_O8                C-OC-CCNCOCCCOCCC---
+[ATOM_MATCHING]
+1    |1 1|2 2|3 3|4 4|5 5|6 6|7 7|8 8|9 9|10 10|11 11|12 12|13 13|14 14|15 15|16 16|17 17|18 18|19 19|20 20
+2    |1 7|2 8|3 9|4 5|5 6|6 1|7 2|8 18|9 19|10 21|11 20|12 3|13 4|15 12|16 16|17 14|18 15|19 17
+3    |1 1|2 2|3 3|4 4|5 5|6 6|7 7|8 8|9 9|10 10|11 11|12 12|16 19|17 17|18 18|19 20|20 21
+4    |1 1|2 2|3 3|4 4|5 5|6 6|7 8|8 9|9 10|10 11|11 12|12 13|13 14|20 7
+5    |1 2|2 1|3 14|4 3|5 4|6 5|7 6|8 13|9 11|10 19|11 12|12 7|14 17|15 8|17 9|18 10
+6    |1 1|2 15|3 16|4 2|5 3|6 4|7 5|8 14|9 12|10 19|11 13|12 6|14 7|15 8|16 9|19 11
+7    |1 1|2 13|3 14|4 2|5 3|6 4|7 5|8 12|9 10|10 20|11 11|12 6|14 17|15 7|16 8|19 9
+8    |1 1|2 2|3 3|4 4|5 5|6 6|7 8|8 9|9 10|10 11|11 12|12 13|13 15|20 7
+9    |1 1|2 2|3 3|4 4|5 18|6 17|7 12|8 13|9 14|10 15|11 16|12 6|13 5|15 8|17 10
+10   |1 1|2 2|3 3|4 4|5 18|6 17|7 12|8 13|9 14|10 15|11 16|12 6|13 5|15 8|17 10
+11   |1 3|2 1|3 2|4 4|5 9|6 8|7 7|8 11|9 10|10 12|11 13|12 6|13 5
+12   |1 6|3 11|4 5|6 1|7 2|8 12|9 13|10 15|11 14|12 3|13 4|14 9|15 16|16 17|17 18
+13   |1 13|3 14|4 11|5 9|6 7|7 5|8 6|9 15|10 16|11 17|12 4|14 20|15 19|16 18|17 21|19 1
+14   |1 2|2 1|3 17|4 5|5 15|6 13|7 8|8 9|9 10|10 11|11 12|12 4|14 6|15 7
+15   |1 1|2 2|3 3|4 4|5 17|6 16|7 11|8 12|9 13|10 14|11 15|12 6|13 5|15 8
+16   |1 1|2 13|3 14|4 2|5 3|6 4|7 5|8 12|9 10|10 20|11 11|12 6|15 8|17 9|20 15
+17   |1 1|2 2|3 3|4 4|5 5|6 6|7 8|8 9|9 10|10 11|11 12|12 13|15 17|17 19|20 7
+18   |1 6|3 16|4 5|6 1|7 2|8 20|9 7|10 17|11 8|12 3|13 4|14 13|15 9|16 10|17 11
+19   |1 6|3 16|4 5|6 1|7 2|8 20|9 7|10 17|11 8|12 3|13 4|14 13|15 9|16 10|17 11
+</PRE>
+
+
+<A NAME="FormatSimilarityMatrix">
+<LI><H3>All-vs-all comparison file</H3><P>
+
+
+<H4>File Format example of Similarity Matrix (-fsm S)</H4>
+<PRE>
+#COMMAND lkcombu -M A -idl src/sample_sdf -con T -mtd 1 -fsm S -osm smat.out
+#START_DATE Feb 10,2012 9:32:14
+#END_DATE   Feb 10,2012 9:32:14
+5
+SIA                      1.000    0.826    0.952    0.760    0.519
+EQP                      0.826    1.000    0.864    0.692    0.464
+DAN                      0.952    0.864    1.000    0.792    0.538
+ZMR                      0.760    0.692    0.792    1.000    0.483
+G39                      0.519    0.464    0.538    0.483    1.000
+</PRE>
+
+<H4>File Format example of Distance Matrix (-fsm D)</H4>
+<PRE>
+#COMMAND lkcombu -M A -idl src/sample_sdf -con T -mtd 1 -fsm D -osm dmat.out
+#START_DATE Feb 10,2012 9:31:59
+#END_DATE   Feb 10,2012 9:32:0
+5
+SIA                      0.000    0.174    0.048    0.240    0.481
+EQP                      0.174    0.000    0.136    0.308    0.536
+DAN                      0.048    0.136    0.000    0.208    0.462
+ZMR                      0.240    0.308    0.208    0.000    0.517
+G39                      0.481    0.536    0.462    0.517    0.000
+</PRE>
+
+<H4>File Format example of Similarity List File (-fsm L)</H4>
+<PRE>
+#>>Similarities in List format<<
+#COMMAND lkcombu -M A -idl src/sample_sdf -con T -mtd 1 -fsm L -osm list.out
+#DATE_START Feb 10,2012 9:32:48
+#LIBRARY_DIRECTORY src/sample_sdf
+#NMOL_IN_LIBRARY 5
+#DATA 0 SIA
+#DATA 1 EQP
+#DATA 2 DAN
+#DATA 3 ZMR
+#DATA 4 G39
+0 1 0.826087
+0 2 0.952381
+0 3 0.760000
+0 4 0.518519
+1 2 0.863636
+1 3 0.692308
+1 4 0.464286
+2 3 0.791667
+2 4 0.538462
+3 4 0.482759
+</PRE>
+
+<H4>File Format example of Similarity List File with molecular name(-fsm N)</H4>
+<PRE>
+#>>Similarities in List format<<
+#COMMAND lkcombu -M A -idl src/sample_sdf -con T -mtd 1 -fsm N -osm list_with_name.out
+#DATE_START Feb 10,2012 9:33:0
+#LIBRARY_DIRECTORY src/sample_sdf
+#NMOL_IN_LIBRARY 5
+#DATA 0 SIA
+#DATA 1 EQP
+#DATA 2 DAN
+#DATA 3 ZMR
+#DATA 4 G39
+0 SIA 1 EQP 0.826087
+0 SIA 2 DAN 0.952381
+0 SIA 3 ZMR 0.760000
+0 SIA 4 G39 0.518519
+1 EQP 2 DAN 0.863636
+1 EQP 3 ZMR 0.692308
+1 EQP 4 G39 0.464286
+2 DAN 3 ZMR 0.791667
+2 DAN 4 G39 0.538462
+3 ZMR 4 G39 0.482759
+</UL>
+
+
+</BODY>
+</HTML>

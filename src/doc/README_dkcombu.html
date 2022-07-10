@@ -1,0 +1,260 @@
+<HTML>
+<TITLE>
+Instruction for the command 'dkcombu' in the "KCOMBU" program 
+</TITLE>
+<style>
+PRE {
+background-color : #E0E0E0;
+}
+CODE {
+background-color : #F0F0F0;
+}
+</style>
+
+<BODY>
+
+<CENTER>
+<H2>
+Instruction for the command 'dkcombu' in the "KCOMBU" program 
+</H2>
+</CENTER>
+
+<CENTER>
+Apr 19, 2015<BR>
+Takeshi Kawabata <BR>
+(kawabata@protein.osaka-u.ac.jp) <BR>
+
+Laboratory of Protein Informatics <BR>
+Institute for Protein Research, Osaka University<BR>
+</CENTER>
+<P>
+[Reference for KCOMBU]<BR>
+Kawabata T.  Build-up algorithm for atomic correspondence between chemical structure. 
+<I>J.Chem.Info.Model.</I>, <B>2011</B>, <I>51</I>, 1775-1787.
+<P>
+<HR>
+The program 'dkcombu' is developed for a faster chemical structrure comparison 
+than MCS comparison programs, such as 'lkcombu'.  To search much faster than MCS,
+the atom pair descriptor search method is introduced as the first filtering step.
+<HR>
+
+<H2>Installation</H2> <P>
+The source code of the kcombu is mainly written in C, and developed and executed
+the linux environment (actually on the CentOS).  
+Some additional programs for 2D graphics and statistical analyses are written in python.
+For the installation, you need the gcc compiler.
+If you want to use another compipler, please change the "Makefile" in the "src" directory.
+The standard installation procedures are as follows:
+ <P>
+ <OL>
+   <LI> download the file "kcombu-src-[date].tar.gz" file.
+
+   <LI> <PRE>tar zxvf kcombu-src-[date].tar.gz</PRE>
+
+   <LI> <PRE>cd src</PRE>
+   <LI> <PRE>make -f Makefile.dkcombu</PRE>
+ </OL>
+ <P>
+
+
+If the sources is successfully compiled, an execution file 
+"dkcombu" will appear in the "../src" directory.
+
+<P>
+<HR>
+<A NAME="dkcombu">
+<H2>Simple Usage of 'dkcombu' program</H2> <P>
+
+<UL>
+
+<LI> 'D':for making descriptor file from the molecule library
+ <PRE>$dkcombu -M D -ifl  [files of lib multi mol] -odes [output_descriptor_file]</PRE>
+ <PRE>$dkcombu -M D -idl  [dir. of  lib mol]       -odes [output_descriptor_file]</PRE>
+ <PRE>$dkcombu -M D -idml [dir. of  lib multi mol] -odes [output_descriptor_file]</PRE>
+<LI>'S': Query vs Library chemical structure search
+ <PRE>$dkcombu -M S -Q [query_mol] -ides [input_lib_descriptor_file] -osc [result] </PRE>
+<LI>'A': All-vs-all chemical structure comparison
+ <PRE>$dkcombu -M A -ides [input_lib_descriptor_file] -osl [output_similarity_listfile]</PRE>
+ <PRE>$dkcombu -M A -ides [input_lib_descriptor_file] -osm [output_similarity_matrix]</PRE>
+<LI>'G': Comparison between Query-lib vs Library
+ <PRE>$dkcombu -M G -idlq [dir. of query-lib mol] -ides [input_lib_descriptor_file] -osm [result]</PRE>
+</UL>
+
+<HR>
+<H2>File Format of Output Result</H2>
+The format of the search result file (<CODE>-osc</CODE>) is  described in <A HREF="README_lkcombu.html#FormatLibrarySearch">README_lkcombu.html</A>.
+<BR>
+The format of the similarity matrix (<CODE>-osm</CODE>) is  described in <A HREF="README_lkcombu.html#FormatSimilarityMatrix">README_lkcombu.html</A>.
+
+<H2>Options for calculating MCS</H2>
+ Input options for calculating MCS is the same as that of the program <I>pkcombu</I>(see <A HREF="README_pkcombu.html">README_pkcombu.html</A>).
+<HR>
+
+<H2>Atom pair descriptor</H2>
+<P>
+The atom pair desctiptor was proposed by Cahart <I>et al</I>.(1985).
+The atom pair descriptor encodes atom pairs with the atom types and the shortest separation distance on the shortest path
+( <CODE> [atom type1]-[distance]-[atom type2] </CODE>).
+The vector of the observed count of atom pairs is used as the descriptor.
+The default atom classification is the "KCOMBU"-recommended (<CODE>-at K</CODE>).
+It employs 12 classes for the classfication (<CODE>C,C@,C1,O,O@,O1,N,N@,N1,P,S,X</CODE>).
+The default separation (<CODE>-sep</CODE>) is set to <CODE>10</CODE>.
+Therefore, number of atom pair pattern is 720 (=12 x 12 /2 x 10).
+<P>
+An example of the atom pair descriptor for a serine molecule is shown as follows.
+
+<BR>
+<IMG SRC="img/SER.png"><P>
+<BR>
+Atom pair desctiptor vector for a serine molecule.<BR>
+<TABLE BORDER="1">
+<TR>
+<TD>Count</TD>
+<TD>Atom Pair<BR>
+[atom type1]-[distance]-[atom type2]
+</TD>
+</TR>
+<TR><TD>   2 </TD><TD>[C ]-[1]-[C ]</PRE></TD></TR>
+<TR><TD>   3 </TD><TD>[O1]-[1]-[C ]</PRE></TD></TR>
+<TR><TD>   1 </TD><TD>[N1]-[1]-[C ]</PRE></TD></TR>
+<TR><TD>   1 </TD><TD>[C ]-[2]-[C ]</PRE></TD></TR>
+<TR><TD>   3 </TD><TD>[O1]-[2]-[C ]</PRE></TD></TR>
+<TR><TD>   1 </TD><TD>[O1]-[2]-[O1]</PRE></TD></TR>
+<TR><TD>   2 </TD><TD>[N1]-[2]-[C ]</PRE></TD></TR>
+<TR><TD>   3 </TD><TD>[O1]-[3]-[C ]</PRE></TD></TR>
+<TR><TD>   3 </TD><TD>[N1]-[3]-[O1]</PRE></TD></TR>
+<TR><TD>   2 </TD><TD>[O1]-[4]-[O1]</PRE></TD></TR>
+</TABLE>
+
+
+
+<HR>
+<H2>File format of descriptor file</H2> <P>
+<UL>
+<LI><H3>Atom pair descriptor file</H3><BR>
+Two styles of file format are prepared for the atom pair desctiptor:text and binary.
+The binary style is difficult to read for human, however, 
+the file size of binary style descriptors are much smaller that that of text descriptors.
+Due to its small size, the search for the binary descriptors is faster than that for the text.
+
+ 
+<P>
+<U><B>Text Style</B></U><BR>
+The text format of the atom pair desctriptor is summarized as follows:
+<TABLE BORDER="1">
+<TR><TD>
+<PRE>
+>[num_mol] [compound_filename] [num_file] [file_offset] [Nheavyatom] [molecular_formula] [oneatom_descriptor]
+[descriptor_num] [observed_count] [atomtype1] [separation] [atomtype2]
+//
+</PRE>
+</TD></TR>
+</TABLE>
+
+<P>
+An example of text-style atom pair descriptors for two molecules (SER and ALA) 
+is shown as follows:
+<TABLE BORDER="1">
+<TR><TD>
+<PRE>
+#>>File_for_AtomPair_Descriptor<<
+#COMMAND dkcombu -M D -idl sample_dir -odes sample.des
+#DATE    Mar 1,2013 14:30:15
+#ATOMTYPE_CLASS  K
+#MAX_ATOMTYPE    12
+#TYPE_ATOMPAIR  N
+#MAX_SEPARATION  10
+#MAX_SEPARATION_CYCLIC  5
+#MAX_SEPARATION_ACYCLIC 5
+#MAX_ATOMPAIR_DESCRIPTOR   780
+#LIBRARY_DIRECTORY sample_dir
+#LIBRARY_FILETYPE S
+#FILE_MODE TEXT
+#>[num_mol] [compound_filename] [num_file] [file_offset] [Nheavyatom] [molecular_formula] [oneatom_descriptor]
+>0 SER 0 0 7 C3_N_O3 C 3 O1 3 N1 1
+ 14   2 C  1 C
+ 49   3 O1 1 C
+ 59   1 N1 1 C
+ 92   1 C  2 C
+127   3 O1 2 C
+132   1 O1 2 O1
+137   2 N1 2 C
+205   3 O1 3 C
+220   3 N1 3 O1
+288   2 O1 4 O1
+//
+>1 ALA 0 0 6 C3_N_O2 C 3 O1 2 N1 1
+ 14   2 C  1 C
+ 49   2 O1 1 C
+ 59   1 N1 1 C
+ 92   1 C  2 C
+127   2 O1 2 C
+132   1 O1 2 O1
+137   2 N1 2 C
+205   2 O1 3 C
+220   2 N1 3 O1
+//
+#NMOL_IN_LIBRARY 2
+</PRE>
+</PRE>
+</TD></TR>
+</TABLE>
+
+<P>
+<U><B>Binary style</B></U><BR>
+The binary style of the atom pair desctriptor is rather similar to the text style.
+The comment line ('>line') is described in text, whereas atom pair desctiptor (desctiptor_num + observed_count) is
+encoded in binary char (1byte). The end of molecule is shown in [65536(bindary)] and '\n'.
+
+<TABLE BORDER="1">
+<TR><TD>
+<PRE>
+>[num_mol] [compound_filename] [num_file] [file_offset] [Nheavyatom] [molecular_formula] [oneatom_descriptor]
+[descriptor_num(binary:char(1byte))][observed_count:char(1byte)]
+[descriptor_num(binary:char(1byte))][observed_count:char(1byte)]
+:
+[descriptor_num(binary:char(1byte))][observed_count:char(1byte)]
+[65536(binary:char(1byte))][\n:char(1byte)]
+</PRE>
+</TD></TR>
+</TABLE>
+<P>
+An example of binary-style atom pair descriptors for two molecules (SER and ALA) 
+is shown as follows. Binary parts of descriptors are not correctly shown (such as "^N^@^B1^@^C;^@^A\^@^A^?^@^C<84>^@^A<89>^@^BÍ^@^CÜ^@^C ^A^Bÿÿ").
+<TABLE BORDER="1">
+<TR><TD>
+<PRE>
+#>>File_for_AtomPair_Descriptor<<
+#COMMAND dkcombu -M D -idl sample_dir -odes out.des -fdes B
+#DATE    Mar 1,2013 16:54:34
+#ATOMTYPE_CLASS  K
+#MAX_ATOMTYPE    12
+#TYPE_ATOMPAIR  N
+#MAX_SEPARATION  10
+#MAX_SEPARATION_CYCLIC  5
+#MAX_SEPARATION_ACYCLIC 5
+#MAX_ATOMPAIR_DESCRIPTOR   780
+#LIBRARY_DIRECTORY sample_dir
+#LIBRARY_FILETYPE S
+#FILE_MODE BINARY
+#>[num_mol] [compound_filename] [num_file] [file_offset] [Nheavyatom] [molecular_formula] [oneatom_descriptor]
+>0 SER 0 0 7 C3_N_O3 C 3 O1 3 N1 1
+^N^@^B1^@^C;^@^A\^@^A^?^@^C<84>^@^A<89>^@^BÍ^@^CÜ^@^C ^A^Bÿÿ
+>1 ALA 0 0 6 C3_N_O2 C 3 O1 2 N1 1
+^N^@^B1^@^B;^@^A\^@^A^?^@^B<84>^@^A<89>^@^BÍ^@^BÜ^@^Bÿÿ
+#NMOL_IN_LIBRARY 2
+</PRE>
+</TD></TR>
+</TABLE>
+</UL>
+
+
+
+<P>
+[Reference for Atom pair desctiptor]<BR>
+Cahart, R.E., Smith, H.S., Venkataraghavan R.  Atom pairs as molecular features in structure-activity studies: definition and applications.
+<I>J.Chem.Inf.Comput.Sci.</I>, <B>25</B>, 64-73 (1985).
+<P>
+
+</BODY>
+</HTML>

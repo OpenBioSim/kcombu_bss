@@ -1,0 +1,430 @@
+<HTML>
+<HEAD>
+<TITLE>
+Instruction for the command 'pkcombu' in the "KCOMBU" program
+</TITLE>
+<style>
+PRE {
+background-color : #E0E0E0;
+}
+CODE {
+background-color : #F0F0F0;
+}
+</style>
+</HEAD>
+<BODY>
+
+<CENTER>
+<H2>
+Instruction for the command 'pkcombu' in the "KCOMBU" program
+</H2>
+</CENTER>
+
+<CENTER>
+2019/01/25<BR>
+Takeshi Kawabata <BR>
+(kawabata@protein.osaka-u.ac.jp) <BR>
+
+Laboratory of Protein Informatics <BR>
+Institute for Protein Research, Osaka University<BR>
+</CENTER>
+<P>
+[Reference for KCOMBU]<BR>
+Kawabata T.  Build-up algorithm for atomic correspondence between chemical structure. 
+<I>J.Chem.Info.Model.</I>, <B>2011</B>, <I>51</I>, 1775-1787.
+<P>
+<HR>
+The program '<I>pkcombu</I>' is for pairwise chemical structure comparison.
+<HR>
+<H2>Installation</H2> <P>
+The source code of the kcombu is mainly written in C, and developed and executed
+the linux environment.
+Some additional programs for 2D graphics and statistical analyses are written in python.
+For the installation, you need the gcc compiler.
+If you want to use another compipler, please change the "Makefile" in the "src" directory.
+The standard installation procedures are as follows:
+ <P>
+ <OL>
+   <LI> download the file "kcombu-src-[date].tar.gz" file.
+
+   <LI> <PRE>tar zxvf kcombu-src-[date].tar.gz</PRE>
+
+   <LI> <PRE>cd src</PRE>
+   <LI> <PRE>make -f Makefile.pkcombu</PRE>
+ </OL>
+ <P>
+
+
+If the sources is successfully compiled, an execution file 
+"pkcombu" will appear in the "../src" directory.
+
+<P>
+For 2D molecular graphics, we prepare python scripts in the directory "src/moldraw".
+The script "moldraw.cgi" is for making image/PDF file of 2D molecules,
+it requires python and Python Imaging Library (PIL) 
+(
+<A HREF="http://www.pythonware.com/products/pil/" TARGET=_BLANK>http://www.pythonware.com/products/pil/</A>
+).
+
+<P>
+<HR>
+<A NAME="pkcombu">
+<UL>
+<LI>Simple Usage of 'pkcombu' program <P>
+
+<UL>
+<LI>for default pairwise comparison.
+<PRE>  $pkcombu -A [molecule_fileA] -B [molecule_fileB] -oam [atom-matching file]</PRE>
+<LI>for Topologically constrained D-MCS (TD-MCS) with max_diff_of_dis = 1
+<PRE>  $pkcombu  -A [molecule_fileA] -B [molecule_fileB] -con T -mtd 1 </PRE>
+<LI>for exact C-MCS
+<PRE>  $pkcombu -A [molecule_fileA] -B [molecule_fileB] -con C -alg X</PRE>
+<LI>for showing options in detail
+<PRE>  $pkcombu -h </PRE>
+<LI>for showing options for mcs 
+<PRE>  $pkcombu -hmcs </PRE>
+</UL>
+
+<LI>Input options for 'pkcombu'
+
+<PRE>
+< input options for 'pkcombu'>
+ -A   : molecule A (molA)(*.sdf|*.mol2|*.pdb|*.kcf|*.smi)[]
+ -B   : molecule B (molB)(*.sdf|*.mol2|*.pdb|*.kcf|*.smi)[]
+ -fA,-fB : file formats.'P'db,'S'df,'K'cf, '2':MOL2, 'M':smiles [--]
+ -aA,-aB : AtomHetero type. 'A'tom 'H'etatm 'B'oth[BB]
+</PRE>
+
+The program "pkcombu" can read several file formats of chemical structures: sdf, mol2, pdb, kcf and smi.  
+The file format is distinguished by file exetentions : *.sdf -> SDF, *.mol2 ->MOL2, *.pdb -> PDB, *.kcf -> KCF, *.smi -> SMILES.
+For molecular files without proper file extensions, users should directly assign the format types by the option '-fA' or '-fB'.
+For example, if a file "hoge" is for molecule A  and in SDF format, users should add the option "-A hoge -fA S".
+
+For the molecule in PDB format, a bond connection table is automatically generated from the
+3D coordinates of atoms, even if it does not have 'CONNCT' lines.
+
+<P>
+<LI>Output options for 'pkcombu' atom matching file
+<PRE>
+<output options for 'pkcombu'>
+ -oam : output file for matching atom numbers[]
+ -oAm : output file for matching atom numbers for all the candidate matches[]
+ -rk  : rank of output atom MATCH by '-oam' option [1]
+</PRE>
+
+The options "-oam" and "-oAm" are for outputting detailed descriptions of 
+calcualted atom matching (atom correspondence).  The option "-oam" is for outputting the best match, the option "-oAm" is for outputting all the calculated candidate matches. The file format of atom matching file is
+described in <A HREF="#FormatAtomMatch">other section</A>.
+
+<P>
+<LI>Other output options for 'pkcombu'
+<PRE>
+<output options for 'pkcombu'>
+ -sup3   : Do    3D-superimpose    molA onto fixed molB (T or F)[F]
+ -pas3   : Paste 3D coordinates to molA from fixed molB (T or F)[F]
+ -opdbA  : output PDB  file for molecule A []
+ -osdfA  : output SDF  file for molecule A []
+ -omol2A : output MOL2 file for molecule A []
+ -opdbAB : output PDB file for rotated molA and fixed molB[]
+ -oras   : output rasmol script for the best match []
+ -omcs   : output maximum common substructue in SDF []
+ -ops    : output PostScript file atom matching []
+</PRE>
+The option '-sup3' is for superimposing molecules.  
+The pkcombu program can simply superimpose molecule A with smallest RMSD against matched atoms of molecule B. 
+For example, if the user assign "-sup3 T -opA outA.pdb", the structure of superimposed molecule A (for molecule B)  is 
+written as "outA.pdb" in PDB format. 
+<P>
+The option "-oras" is for showing matching atoms using the molecular visualization program RasMol.
+If the user assign "-oras out", the pkcombu program generates two files "out-A.ras" and "out-B.ras".
+To visualize matched atoms in molecule A, a user inputs commands as follows:
+<PRE>
+$ rasmol -pdb [moleculeA(in PDB)]
+ or
+$ rasmol -mdl [moleculeA(in SDF)]
+ or 
+$ rasmol -mol2 [moleculeA(in MOL2)]
+RasMol> script "out-A.ras"
+</PRE>
+
+<P>
+The options "-ops" is for output PostScript file to show corresponding atom pairs.
+This option basically assumes that input molecules has two-dimentional structures.
+This figure is generated by following commands: 
+<BR>
+<PRE>
+$pkcombu -A SIA.sdf -B G39.sdf -ops out.ps
+$evince out.ps
+</PRE>
+<CENTER>
+<IMG SRC="img/SIA_G39.png" BORDER="0">
+</CENTER>
+<P>
+<A NAME="OptionMCS">
+<LI>Options for calculating MCS 
+
+<PRE>
+< common options for finding MCS>
+ -alg : Algorithm. 'B'uild-up, 'X':eXact,'P'ca-3D-fit '3'D(raw_fit) 'F':from file (-iam option).[B]
+ -con : Connectivity.'D'isconnected,'C'onnected, 'S'ubstructure(A<=B), 'I'somorphic (A=B),
+      :              'T'opo_constrained_disconnected  't'opo_constrained_connected)[C]
+ -mtd : max difference of topological distance(num of bonds in the shortest path).0:don't care. [-1]
+</PRE>
+
+The option '-alg' specifies the algorithm for MCS.  
+Its default is the Build-up method ('-alg B'), which is fast but sometimes inaccurate.
+The exact algotithm (-alg X) takes a longer 
+computertional time (sometimes "very" long), but it returns the correct maximum common substructure.  
+
+<P>
+The another important options '-con' and '-mtd' specify the connectivity of MCS.
+We recommend the C-MCS (Connected MCS) (-con C), because it takes a short computation
+time, the build-up can find almost exact correspondences. 
+When more flexible correspondences are required,  we recommend TD-MCS
+(Topologically-constrained disconnetecd MCS) with the maximum torelance
+of topological distance (-mtd).
+
+<PRE>
+ Connected MCS(C-MCS)        --> '-con C'
+ TD-MCS with the tolerance=0 --> '-con T -mtd 0'
+ TD-MCS with the tolerance=1 --> '-con T -mtd 1'
+ TD-MCS with the tolerance=2 --> '-con T -mtd 2'
+ Disconnected MCS(D-MCS)     --> '-con D'
+</PRE>
+
+Please note TD-MCS with larger tolerance value (-mtd) takes a longer 
+computation time and the build-up algorithm more often fail to find the correct MCS.
+
+We do not recommend D-MCS (-alg D) and TC-MCS (-alg t) for any practical purposes.
+<P>
+
+<PRE>
+<options for atom type and bond type>
+ -at  : atomtype classification. 'X':don't care 'E'lement(C,N,O) ele+'R'ing (C,C@,N,N@)
+      :   ele+'B'ond_num (C1,C2,C3) 'T':ele+bond+ring (C2,C2@,C3,C3@)
+      :   'K':combu-recommend(C,C@,O,O@,O1,N,N@,N1,S,S@,P,X) 'D'abrl (D,A,B,R,L) 'k'cf [K]
+</PRE>
+Atom type  classification is important for finding atomic correspondence.
+The option "-at" specifies atom type classification.  The default option is "-at K", which is
+proposed in our paper (Kawabata,2011).  This option '-at K' classfies atoms into 12 types:
+C,C@,O,O@,O1,N,N@,N1,S,S@,P,X.  The atom types with '@' correspond to ring atoms. The atom types with '1' 
+correspond to atoms bonded to one heavy atom.
+<CENTER>
+<IMG SRC="img/SIA.png"><BR>
+Example of the default atom classification for kcombu program (for sialic acids (SIA)).
+</CENTER>
+<P>
+<PRE>
+ -bo  : bondtype classification. 'X':don't care, 'C'are SDF/MOL2-defined bondtype,
+      :                          'R'otatable_nonrotatable. [X]
+</PRE>
+The option '-bo' specifies bond type classificaion.  The default option is "-bo X", which ignores
+any bond types; single, double and triple bonds are considered to be equal.
+The option '-bo R' means that only two types of bonds are considered: rotatable and non-rotatable.   
+<P>
+
+There are many other options especially for the heuristic build-up algorithm. 
+Most of them are not important for users, the default values are recommended for
+the standard purpose.  They are summarized as follows:
+
+<PRE>
+< other common options for build-up MCS algorithm>
+ -nk  : Nkeep for build up [40]
+ -w   : weighting scheme. 'D'efault weighting. 'S'pecified by user  [D]
+ -wna : weight_select_dis for neighoboring atom type     [1.000000]
+ -wec : weight_select_dis for extended connectivity      [1.000000]
+ -wtd : weight_select_dis for topological distance       [0.000000]
+ -wrk : weight_select_dis for rank by unique EC          [0.000000]
+ -wco : weight_select_dis for num of connected component [0.000000]
+ -nrs : Nonredundancy check using selection distance score ('T' or 'F')[T]
+ -ec  : level of EC for scoring ('0','1','2','3','4') [2]
+ -xtd : maximum topological distance for considering Dtopodis [4]
+ -per : Equivalent Atom Permutation. 'F':false,'A':make all,'N'on-redundant 'B'uild-up_filter[F]
+ -ctd : calculate topological distance (T or F) [F]
+ -mco : maximum number of connected component. <=0:don't care. [-1]
+<common options for exact MCS algorithm>
+ -bkmx: maximum number of atom pairs for Bron-Kerbosch [-1]
+ -xsec: maximum computational time (in second) [-1.000000]
+</PRE>
+<LI>Options for calculatinng 2D coordinates <P>
+The program 'pkcombu' have options for generating 2D coordinates of molecules.
+Using these options, input SMILE string can be transformed into 2D chemical structure.
+<PRE>
+-gen2dA : generate 2D coordinates for molecule A (T or F)[F]
+-gen2dB : generate 2D coordinates for molecule B (T or F)[F]
+</PRE>
+ 
+
+
+</UL>
+<P>
+<HR>
+
+
+<H2> visualizing pairwise atom matching using the moldraw program </H2>
+
+  When you calculate a pairwise atom matching by typing a following command,
+ <BR>
+<PRE> 
+   $pkcombu -A molA.pdb -B molB.pdb -oam out.am 
+</PRE> 
+<BR>
+  an atom-matching file "out.am" is generated. 
+  The python script "moldraw.cgi" is stored in '[kcombu_directory]/src/molimg/' 
+  A following command generates a PNG-format image file "out.png"
+<BR>
+<PRE> 
+  $moldraw.cgi -iam out.am
+</PRE> 
+<BR>
+  The image file "out.png" can be visualized by standard photo-retouching programs,
+  such as "display" or "eog".
+<PRE>
+   $display out.png
+   $eog out.png
+</PRE>
+
+The program "moldraw.cgi" can also generating PDF file by a following command:
+<PRE> 
+  $moldraw.cgi -iam out.am -G P -of out.pdf
+</PRE> 
+
+
+<HR>
+<H2>Format of the file generated by pkcombu program</H2>
+<UL>
+<A NAME="FormatAtomMatch">
+<LI><H3 id="format_atom_match">Atom matching file</H3><P> 
+
+Pairwise atom matching calculated by the program <A HREF="#pkcombu">pkcombu</A>, 
+can be written in <CODE>-oam</CODE> option.
+Its format is described as follows:
+<PRE>
+>[number for atom machings]
+[num_in_fileA/B(1,2)] [numA/B(3,4)]  [atomnameA/B(5,6)] [atomtype(7,8)] [EC_A/B(9)] [ECdiff(10)] [Nnei_diff(11)]
+:
+//
+</PRE>
+
+The numbers [num_in_fileA/B] are atomic numbers described in the file.   
+The numbers [numA/B]     are atomic numbers, which starts from '1' and increase one by one.
+For the SDF and MOL2 files, [num_in_fileA/B] and [numA/B] are the same.
+However, for the PDB file, [num_in_fileA/B] and [numA/B] can be diffrent, 
+if the file is taken from the part of the ligand-protein complex.
+
+However, numbers [num_in_fileA(2)] and [num_in_fileB(6)] may start with the number 2943;
+this always happens if the file is taken from the part of the PDB file.
+
+An example of the atom matching from the comparison of the PDB file(ATP_1atpE.pdb) and SDF file (ADP.sdf)
+ is shown as follows:
+<PRE>
+#>> Atom_Number MATCHing file <<
+#COMMAND 'pkcombu -A PDB/ATP_1atpE.pdb -B 3D_SDF/ATP.sdf -oam oam'
+#DATE_START Jan 25,2019 18:58:23
+#DATE_END   Jan 25,2019 18:58:23
+#COMP_TIME  0.054677 seconds
+#AlgoType B
+#ConnectGraphType C
+#Weight Wneiatm 1.00 Wextcon 1.00 Wtopodis 0.00
+#CalcFinished F
+#MoleculeA PDB/ATP_1atpE.pdb
+#MoleculeB 3D_SDF/ATP.sdf
+#FiletypeA P
+#FiletypeB S
+#NatomA 31
+#NatomB 47
+#NheavyatomA 31
+#NheavyatomB 31
+#TotalNatompair 199
+#NpermuA 0
+#NpermuB 0
+#Len_of_MATCHlist 1
+#RankMatchOutput 1
+>1
+#Npair_atom  31
+#tanimoto    1.000000
+#select_dis  0.000000
+#Ncomponent  1
+#Maxdiff_topodis  0
+#[num_in_fileA:1] [num_in_fileB:2]  [numA:3]  [numB:4]
+#[atomnameA:5] [atomnameB:6] [atomtype:7] [EC_A:8] [EC_B:9] [ECdiff:10] [Nnei_diff:11]
+2939  1     1     1      PG   P1  P    20 20  0  0
+2940  2     2     2      O1G  O1  O1    5  5  0  0
+2941  3     3     3      O2G  O2  O1    5  5  0  0
+2942  4     4     4      O3G  O3  O1    5  5  0  0
+2943  5     5     5      PB   P2  P    24 24  0  0
+2944  6     6     6      O1B  O4  O1    6  6  0  0
+2945  7     7     7      O2B  O5  O1    6  6  0  0
+2946  8     8     8      O3B  O6  O    11 11  0  0
+2947  9     9     9      PA   P3  P    22 22  0  0
+2948  10    10    10     O1A  O7  O1    6  6  0  0
+2949  11    11    11     O2A  O8  O1    6  6  0  0
+2950  12    12    12     O3A  O9  O    12 12  0  0
+2951  13    13    13     O5'  O10 O    11 11  0  0
+2952  14    14    14     C5'  C1  C    13 13  0  0
+2953  15    15    15     C4'  C2  C@   18 18  0  0
+2954  16    16    16     O4'  O11 O@   15 15  0  0
+2955  17    17    17     C3'  C3  C@   17 17  0  0
+2956  18    18    18     O3'  O12 O1    7  7  0  0
+2957  19    19    19     C2'  C4  C@   18 18  0  0
+2958  20    20    20     O2'  O13 O1    7  7  0  0
+2959  21    21    21     C1'  C5  C@   21 21  0  0
+2960  22    22    22     N9   N1  N@   21 21  0  0
+2961  23    23    23     C8   C6  C@   13 13  0  0
+2962  24    24    24     N7   N2  N@   13 13  0  0
+2963  25    25    25     C5   C7  C@   19 19  0  0
+2964  26    26    26     C6   C8  C@   16 16  0  0
+2965  27    27    27     N6   N3  N1    6  6  0  0
+2966  28    28    28     N1   N4  N@   10 10  0  0
+2967  29    29    29     C2   C9  C@   10 10  0  0
+2968  30    30    30     N3   N5  N@   12 12  0  0
+2969  31    31    31     C4   C10 C@   21 21  0  0
+//
+</PRE>
+
+<LI><H3 id="format_atom_match_minimum">Minimum Atom matching file</H3><P> 
+
+When users want <I>pkcombu/fkcombu</I> to read their own atom matching file, by 
+the option <CODE>-iam</CODE>,  a much simpler format is favorable.  The <I>pkcombu/fkcombu</I> can read
+a following format, which contains only two columns; [numfile] for molecule A and [numfile]
+for molecule B. The [numfile] is an atomic number described in the molecular file.
+<PRE>
+2939  1
+2940  2
+2941  3
+2942  4
+2943  5
+2944  6
+2945  7
+2946  8
+2947  9
+2948  10
+2949  11
+2950  12
+2951  13
+2952  14
+2953  15
+2954  16
+2955  17
+2956  18
+2957  19
+2958  20
+2959  21
+2960  22
+2961  23
+2962  24
+2963  25
+2964  26
+2965  27
+2966  28
+2967  29
+2968  30
+2969  31
+</PRE>
+
+
+</UL>
+
+
+</BODY>
+</HTML>

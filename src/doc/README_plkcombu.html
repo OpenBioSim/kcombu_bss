@@ -1,0 +1,738 @@
+<HTML>
+<HEAD>
+<TITLE>
+Instruction for the commands 'pkcombu' and 'lkcombu' in the "KCOMBU" program
+</TITLE>
+<style>
+PRE {
+background-color : #E0E0E0;
+}
+CODE {
+background-color : #F0F0F0;
+}
+</style>
+
+</HEAD>
+<BODY>
+<CENTER>
+<H2>
+Instruction for the commands 'pkcombu' and 'lkcombu' in the "KCOMBU" program
+</H2>
+</CENTER>
+
+<CENTER>
+Jan 5, 2014<BR>
+Takeshi Kawabata <BR>
+(kawabata@protein.osaka-u.ac.jp) <BR>
+
+Laboratory of Protein Informatics <BR>
+Institute for Protein Research, Osaka University<BR>
+</CENTER>
+<P>
+[Reference for KCOMBU]<BR>
+Kawabata T.  Build-up algorithm for atomic correspondence between chemical structure. 
+<I>J.Chem.Info.Model.</I>, <B>2011</B>, <I>51</I>, 1775-1787.
+<P>
+<HR>
+<H2>Installation</H2> <P>
+The source code of the kcombu is mainly written in C, and developed and executed
+the linux environment.
+Some additional programs for 2D graphics and statistical analyses are written in python.
+For the installation, you need the gcc compiler.
+If you want to use another compipler, please change the "Makefile" in the "src" directory.
+The standard installation procedures are as follows:
+ <P>
+ <OL>
+   <LI> download the file "kcombu-src-[date].tar.gz" file.
+
+   <LI> <PRE>tar zxvf kcombu-src-[date].tar.gz</PRE>
+
+   <LI> <PRE>cd src</PRE>
+   <LI> <PRE>make -f Makefile.pkcombu</PRE>
+   <LI> <PRE>make -f Makefile.lkcombu</PRE>
+ </OL>
+ <P>
+
+
+If the sources is successfully compiled,  two execution files 
+"pkcombu" and "lkcombu" will appear in the "../src" directory.
+
+<P>
+For 2D molecular graphics, we prepare python scripts in the directory "src/moldraw".
+The script "moldraw.cgi" is for making image/PDF file of 2D molecules,
+it requires python and Python Imaging Library (PIL) 
+(
+<A HREF="http://www.pythonware.com/products/pil/" TARGET=_BLANK>http://www.pythonware.com/products/pil/</A>
+).
+and PyX(
+<A HREF="http://pyx.sourceforge.net/" TARGET=_BLANK>http://pyx.sourceforge.net/</A>
+).
+
+<P>
+<HR>
+<A NAME="pkcombu">
+<H2>'pkcombu' :  pairwise chemical structure comparison</H2><P>
+<UL>
+<LI>Simple Usage of 'pkcombu' program <P>
+
+<UL>
+<LI>for default pairwise comparison.
+<PRE>  $pkcombu -A [molecule_fileA] -B [molecule_fileB] -oam [atom-matching file]</PRE>
+<LI>for Topologically constrained D-MCS (TD-MCS) with max_diff_of_dis = 1
+<PRE>  $pkcombu  -A [molecule_fileA] -B [molecule_fileB] -con T -mtd 1 </PRE>
+<LI>for exact C-MCS
+<PRE>  $pkcombu -A [molecule_fileA] -B [molecule_fileB] -con C -alg X</PRE>
+<LI>for showing options in detail
+<PRE>  $pkcombu -h </PRE>
+<LI>for showing options for mcs 
+<PRE>  $pkcombu -hmcs </PRE>
+</UL>
+
+<LI>Input options for 'pkcombu'
+
+<PRE>
+< input options for 'pkcombu'>
+ -A   : molecule A (molA)(*.sdf|*.mol2|*.pdb|*.kcf|*.smi)[]
+ -B   : molecule B (molB)(*.sdf|*.mol2|*.pdb|*.kcf|*.smi)[]
+ -fA,-fB : file formats.'P'db,'S'df,'K'cf, '2':MOL2, 'M':smiles [--]
+ -aA,-aB : AtomHetero type. 'A'tom 'H'etatm 'B'oth[BB]
+</PRE>
+
+The program "pkcombu" can read several file formats of chemical structures: sdf, mol2, pdb, kcf and smi.  
+The file format is distinguished by file exetentions : *.sdf -> SDF, *.mol2 ->MOL2, *.pdb -> PDB, *.kcf -> KCF, *.smi -> SMILES.
+For molecular files without proper file extensions, users should directly assign the format types by the option '-fA' or '-fB'.
+For example, if a file "hoge" is for molecule A  and in SDF format, users should add the option "-A hoge -fA S".
+
+For the molecule in PDB format, a bond connection table is automatically generated from the
+3D coordinates of atoms, even if it does not have 'CONNCT' lines.
+
+<P>
+<LI>Output options for 'pkcombu' atom matching file
+<PRE>
+<output options for 'pkcombu'>
+ -oam : output file for matching atom numbers[]
+ -oAm : output file for matching atom numbers for all the candidate matches[]
+ -rk  : rank of output atom MATCH by '-oam' option [1]
+</PRE>
+
+The options "-oam" and "-oAm" are for outputting detailed descriptions of 
+calcualted atom matching (atom correspondence).  The option "-oam" is for outputting the best match, the option "-oAm" is for outputting all the calculated candidate matches. The file format of atom matching file is
+described in <A HREF="#FormatAtomMatch">other section</A>.
+
+<P>
+<LI>Other output options for 'pkcombu'
+<PRE>
+<output options for 'pkcombu'>
+ -sup3   : Do    3D-superimpose    molA onto fixed molB (T or F)[F]
+ -pas3   : Paste 3D coordinates to molA from fixed molB (T or F)[F]
+ -opdbA  : output PDB  file for molecule A []
+ -osdfA  : output SDF  file for molecule A []
+ -omol2A : output MOL2 file for molecule A []
+ -opdbAB : output PDB file for rotated molA and fixed molB[]
+ -oras   : output rasmol script for the best match []
+ -omcs   : output maximum common substructue in SDF []
+ -ops    : output PostScript file atom matching []
+</PRE>
+The option '-sup3' is for superimposing molecules.  
+The pkcombu program can simply superimpose molecule A with smallest RMSD against matched atoms of molecule B. 
+For example, if the user assign "-sup3 T -opA outA.pdb", the structure of superimposed molecule A (for molecule B)  is 
+written as "outA.pdb" in PDB format. 
+<P>
+The option "-oras" is for showing matching atoms using the molecular visualization program RasMol.
+If the user assign "-oras out", the pkcombu program generates two files "out-A.ras" and "out-B.ras".
+To visualize matched atoms in molecule A, a user inputs commands as follows:
+<PRE>
+$ rasmol -pdb [moleculeA(in PDB)]
+ or
+$ rasmol -mdl [moleculeA(in SDF)]
+ or 
+$ rasmol -mol2 [moleculeA(in MOL2)]
+RasMol> script "out-A.ras"
+</PRE>
+
+<P>
+The options "-ops" is for output PostScript file to show corresponding atom pairs.
+This option basically assumes that input molecules has two-dimentional structures.
+This figure is generated by following commands: 
+<BR>
+<PRE>
+$pkcombu -A SIA.sdf -B G39.sdf -ops out.ps
+$evince out.ps
+</PRE>
+<CENTER>
+<IMG SRC="img/SIA_G39.png" BORDER="0">
+</CENTER>
+<P>
+<A NAME="OptionMCS">
+<LI>Options for calculating MCS 
+
+<PRE>
+< common options for finding MCS>
+ -alg : Algorithm. 'B'uild-up, 'X':eXact,'P'ca-3D-fit '3'D(raw_fit) 'F':from file (-iam option).[B]
+ -con : Connectivity.'D'isconnected,'C'onnected, 'S'ubstructure(A<=B), 'I'somorphic (A=B),
+      :              'T'opo_constrained_disconnected  't'opo_constrained_connected)[C]
+ -mtd : max difference of topological distance(num of bonds in the shortest path).0:don't care. [-1]
+</PRE>
+
+The option '-alg' specifies the algorithm for MCS.  
+Its default is the Build-up method ('-alg B'), which is fast but sometimes inaccurate.
+The exact algotithm (-alg X) takes a longer 
+computertional time (sometimes "very" long), but it returns the correct maximum common substructure.  
+
+<P>
+The another important options '-con' and '-mtd' specify the connectivity of MCS.
+We recommend the C-MCS (Connected MCS) (-con C), because it takes a short computation
+time, the build-up can find almost exact correspondences. 
+When more flexible correspondences are required,  we recommend TD-MCS
+(Topologically-constrained disconnetecd MCS) with the maximum torelance
+of topological distance (-mtd).
+
+<PRE>
+ Connected MCS(C-MCS)        --> '-con C'
+ TD-MCS with the tolerance=0 --> '-con T -mtd 0'
+ TD-MCS with the tolerance=1 --> '-con T -mtd 1'
+ TD-MCS with the tolerance=2 --> '-con T -mtd 2'
+ Disconnected MCS(D-MCS)     --> '-con D'
+</PRE>
+
+Please note TD-MCS with larger tolerance value (-mtd) takes a longer 
+computation time and the build-up algorithm more often fail to find the correct MCS.
+
+We do not recommend D-MCS (-alg D) and TC-MCS (-alg t) for any practical purposes.
+<P>
+
+<PRE>
+<options for atom type and bond type>
+ -at  : atomtype classification. 'X':don't care 'E'lement(C,N,O) ele+'R'ing (C,C@,N,N@)
+      :   ele+'B'ond_num (C1,C2,C3) 'T':ele+bond+ring (C2,C2@,C3,C3@)
+      :   'K':combu-recommend(C,C@,O,O@,O1,N,N@,N1,S,S@,P,X) 'D'abrl (D,A,B,R,L) 'k'cf [K]
+</PRE>
+Atom type  classification is important for finding atomic correspondence.
+The option "-at" specifies atom type classification.  The default option is "-at K", which is
+proposed in our paper (Kawabata,2011).  This option '-at K' classfies atoms into 12 types:
+C,C@,O,O@,O1,N,N@,N1,S,S@,P,X.  The atom types with '@' correspond to ring atoms. The atom types with '1' 
+correspond to atoms bonded to one heavy atom.
+<CENTER>
+<IMG SRC="img/SIA.png"><BR>
+Example of the default atom classification for kcombu program (for sialic acids (SIA)).
+</CENTER>
+<P>
+<PRE>
+ -bo  : bondtype classification. 'X':don't care, 'C'are SDF/MOL2-defined bondtype,
+      :                          'R'otatable_nonrotatable. [X]
+</PRE>
+The option '-bo' specifies bond type classificaion.  The default option is "-bo X", which ignores
+any bond types; single, double and triple bonds are considered to be equal.
+The option '-bo R' means that only two types of bonds are considered: rotatable and non-rotatable.   
+<P>
+
+There are many other options especially for the heuristic build-up algorithm. 
+Most of them are not important for users, the default values are recommended for
+the standard purpose.  They are summarized as follows:
+
+<PRE>
+< other common options for build-up MCS algorithm>
+ -nk  : Nkeep for build up [40]
+ -w   : weighting scheme. 'D'efault weighting. 'S'pecified by user  [D]
+ -wna : weight_select_dis for neighoboring atom type     [1.000000]
+ -wec : weight_select_dis for extended connectivity      [1.000000]
+ -wtd : weight_select_dis for topological distance       [0.000000]
+ -wrk : weight_select_dis for rank by unique EC          [0.000000]
+ -wco : weight_select_dis for num of connected component [0.000000]
+ -nrs : Nonredundancy check using selection distance score ('T' or 'F')[T]
+ -ec  : level of EC for scoring ('0','1','2','3','4') [2]
+ -xtd : maximum topological distance for considering Dtopodis [4]
+ -per : Equivalent Atom Permutation. 'F':false,'A':make all,'N'on-redundant 'B'uild-up_filter[F]
+ -ctd : calculate topological distance (T or F) [F]
+ -mco : maximum number of connected component. <=0:don't care. [-1]
+<common options for exact MCS algorithm>
+ -bkmx: maximum number of atom pairs for Bron-Kerbosch [-1]
+ -xsec: maximum computational time (in second) [-1.000000]
+</PRE>
+<LI>Options for calculatinng 2D coordinates <P>
+The program 'pkcombu' have options for generating 2D coordinates of molecules.
+Using these options, input SMILE string can be transformed into 2D chemical structure.
+<PRE>
+-gen2dA : generate 2D coordinates for molecule A (T or F)[F]
+-gen2dB : generate 2D coordinates for molecule B (T or F)[F]
+</PRE>
+ 
+
+
+</UL>
+<P>
+<HR>
+
+<H2>'lkcombu' : chemical structure comparison using compound library</H2>
+<P>  
+
+<UL>
+<LI> Simple usage of 'lkcombu'<P>
+
+The program 'lkcombu' has two main modes for calculation: query-library search ("-M S")
+and all-vs-all comparison("-M A").  The simplest usages are summarized as follows:
+
+<PRE>
+>for query-library search
+  $lkcombu -M S -Q [query_mol] -ifl  [files of lib multi mols] -fL [S|P|2] -osc [output_file]
+  $lkcombu -M S -Q [query_mol] -idl  [dir   of lib mols]       -fL [S|P|2] -osc [output_file]
+  $lkcombu -M S -Q [query_mol] -idml [dir   of lib multi mols] -fL [S|P|2] -osc [output_file]
+>for all-vs-all comparison
+  $lkcombu -M A -ifl  [file of lib. multi mols] -fL [S|P|2] -osm [output_file]
+  $lkcombu -M A -idl  [dir of lib. mols]        -fL [S|P|2] -osm [output_file]
+  $lkcombu -M A -idml [dir of lib. multi mols]  -fL [S|P|2] -osm [output_file]
+ (-fL : file formats.'P'db,'S'df,'K'cf, '2':MOL2)
+>for comparison bwn two groups 
+  $lkcombu -M G -idlq [dir of query lib. mols] -idl [dir of lib mols] -fQ [S|P|2] -fL [S|P|2] -osm [output_file]
+>for randomly selecting library
+  $lkcombu -M R -idl [dir of lib. mols] -nlr [num_select_mol] -tam [threMCS] -oms [out_multi_mol] -omsd [out_mol_dir]
+>for showing options in detail
+  $lkcombu -h
+>for showing options for MCS
+  $lkcombu -hmcs
+</PRE>
+
+<LI> Options for Input Library (for "-M S" and "-M A") <P> 
+
+Both modes ("-M S" and "-M A") requires library molecular files, which can be specified by the following options:
+
+
+<PRE>
+<options for input library>
+ -ifl : input files for all the library molecules (file1:file2:..) []
+ -idl : input directory for library molecules   [.]
+ -ill : input list of library molecules[]
+ -ihl : required header string of input file (combined with -idl option) []
+ -fL  : file formats.'P'db,'S'df,'K'cf, '2':MOL2 [-]
+ -aL  : AtomHetero type. 'A'tom 'H'etatm 'B'oth[B]
+</PRE>
+
+We prepare two ways to specify a molecular library.
+<OL>
+<LI> Library molecules are stored in multiple molecular files (multi SDF, multi MOL2, multi PDB file).
+<PRE>
+  -ifl [multi SDF file]  -fL [S]
+  -ifl [multi PDB file]  -fL [P]
+  -ifl [multi MOL2 file] -fL [2]
+</PRE>
+  Multiple library files can be acceptable by spliting colon symbols ':' : 
+<PRE>
+  -ifl [file1]:[file2]:[file3]
+</PRE>
+
+<LI> All the library molecules are stored under a directory; one file for one molecule.
+If you use a following option, the lkcombu read all the files under the directory specified by '-idl' option.
+<PRE>  
+  -idl [directory_for_library_molecule] 
+</PRE>  
+</OL>
+
+<P>
+<LI> Options for Library Search (for "-M S")
+<PRE>
+<options for 'lkcombu -M S':inputing query molecule>
+ -Q   : query molecule Q (*.sdf|*.mol2|*.pdb|*.kcf|*.smi)[]
+ -fQ  : file formats.'P'db,'S'df,'K'cf, '2':MOL2,'M':SMILES [-]
+ -aQ  : AtomHetero type. 'A'tom 'H'etatm 'B'oth[B]
+</PRE> 
+The program "lkcombu" can read several file formats of chemical structures: sdf, mol2, pdb, kcf and smi.  
+The file format is distinguished by file exetentions : *.sdf -> SDF, *.mol2 ->MOL2, *.pdb -> PDB, *.kcf -> KCF, *.smi ->SMILES.
+For molecular files without proper file extensions, users should directly assign the format types 
+by the option '-fQ'.  For example, if a file "hoge" is for query  and in SDF format, users should add the option 
+"-Q hoge -fQ S".
+
+<PRE> 
+ -tao : Tanimoto threshold value for one atom descriptor (filtering) [0.000000]
+ -tam : Tanimoto threshold value for MCS (output)                 [0.000000]
+ -osc : output search result file   [sch.out]
+</PRE>
+
+The options "-tao" and "-tam" specify the theshold tanimoto similarity score for the search.
+The option "-tao" is more important. 
+The option "-tao" specifies threshold tanimoto values for one atom descriptor, in other words, molecular formula.
+If a user specifies high value for this threshold (such as "-tao 0.9"), the program quickly throws away
+most of library molecules without calculating their MCSs.  The option "-tam" specifies threshold tanimoto values for
+MCS; library molecule with more than "-tam" score are finally listed.
+
+The option "-osc" specifies the output file name of library search.  The default file name is "sch.out".
+Its file format is described in <A HREF="#FormatLibrarySearch"> the last section </A>.
+
+<P>
+<LI>Options for all-vs-all comparison (for "-M A") and two-group comparison (for "-M G")<P>
+
+For the all-vs-all comparison ("-M A") and the two-group comparison,
+we prepare four types of output files as follows:
+<PRE>
+<options for '-M A' and '-M G'>
+ -osm : output file for similarities  [sim.out]
+ -fsm : file formats for osm. 'L':simple pairwise list.'N':list with molecular names
+      :                       'D':distance matrix.  'S'imilarity matrix [N]
+</PRE>
+Their file formats are  described in <A HREF="#FormatAllvsallComparison"> the last section </A>.
+<P>
+
+The threshold score options -tao and -tam also work for the '-M A' and '-M G'.
+If you want focus on only similar molecular pairs ,for example,with tanimoto similarity > 0.5,
+adding the option '-tao 0.5' largely reduces your computation time.
+<PRE>
+ -tao : Tanimoto threshold value for one atom descriptor (filtering) [0.000000]
+ -tam : Tanimoto threshold value for MCS (output)                 [0.000000]
+</PRE>
+
+<P>
+The all-vs-all comparison requires a large computation time, proportional to squares of number of library molecules.
+If you compare more than 1000 molecules, I recommend to use multiple CPU cores for the all-vs-all comparison,
+using '-div' options.
+
+<PRE>
+ -div : Job division. {0..Ndivision-1}/(Ndivision). [0/1]
+</PRE>
+
+For example, if you calcualte the all-vs-all comparison using 4 CPU cores, following four commands should be executed:
+<PRE>
+lkcombu -M A -ifl [libfile] -div 0/4 -osm 0.out &
+lkcombu -M A -ifl [libfile] -div 1/4 -osm 1.out &
+lkcombu -M A -ifl [libfile] -div 2/4 -osm 2.out &
+lkcombu -M A -ifl [libfile] -div 3/4 -osm 3.out &
+</PRE>
+After finishing the calculation, you can get the all-vs-all comparison file just by 
+merging these four file (cat 0.out 1.out 2.out 3.out > all.out).
+Please note that the option '-osl' for output file should be used when the '-div' option is employed.
+The option '-odm' and '-osm' will generate imcomplete file (parts of scores are zero) using the '-div' option. 
+
+<P>
+<LI>Options for calculatinng MCS  <P>
+The options for calculating MCS are identical for those for pkcombu. See the <A HREF="#OptionMCS"> pkcombu section </A>
+for the MCS options.
+
+</UL>
+
+<HR>
+
+<H2> visualizing pairwise atom matching using the moldraw program </H2>
+
+  When you calculate a pairwise atom matching by typing a following command,
+ <BR>
+<PRE> 
+   $pkcombu -A molA.pdb -B molB.pdb -oam out.am 
+</PRE> 
+<BR>
+  an atom-matching file "out.am" is generated. 
+  The python script "moldraw.cgi" is stored in '[kcombu_directory]/src/molimg/' 
+  A following command generates a PNG-format image file "out.png"
+<BR>
+<PRE> 
+  $moldraw.cgi -iam out.am
+</PRE> 
+<BR>
+  The image file "out.png" can be visualized by standard photo-retouching programs,
+  such as "display" or "eog".
+<PRE>
+   $display out.png
+   $eog out.png
+</PRE>
+
+The program "moldraw.cgi" can also generating PDF file by a following command:
+<PRE> 
+  $moldraw.cgi -iam out.am -G P -of out.pdf
+</PRE> 
+
+
+<HR>
+<H2>Format of the file generated by kcombu programs</H2>
+<UL>
+<A NAME="FormatAtomMatch">
+<LI><H3 id="format_atom_match">Atom matching file</H3><P> 
+
+Pairwise atom matching calculated by the program <A HREF="#pkcombu">pkcombu</A>, 
+can be written in <CODE>-oam</CODE> option.
+Its format is described as follows:
+<PRE>
+>[number for atom machings]
+[numfileAB(1,2)] [numAB(3,4)]  [atomnameAB(5,6)] [atomtype(7,8)] [EC_AB(9)] [ECdiff(10)] [Nnei_diff(11)]
+:
+//
+</PRE>
+
+The numbers [numfileAB] are atomic numbers described in the file.   
+The numbers [numAB]     are atomic numbers, which starts from '1' and increase one by one.
+For the SDF and MOL2 files, [numfileAB] and [numAB] are the same.
+However, for the PDB file, [numfileAB] and [numAB] can be diffrent, 
+if the file is taken from the part of the ligand-protein complex.
+
+However, numbers [num_in_fileA(2)] and [num_in_fileB(6)] may start with the number 2943;
+this always happens if the file is taken from the part of the PDB file.
+
+An example of the atom matching from the comparison of the PDB file(ATP_1atpE.pdb) and SDF file (ADP.sdf)
+ is shown as follows:
+<PRE>
+#>> Atom_Number MATCHing file <<
+#COMMAND 'pkcombu -T ATP_1atpE.pdb -B ATP.sdf -oam oam'
+#DATE_START Dec 13,2013 15:17:12
+#DATE_END   Dec 13,2013 15:17:12
+#COMP_TIME  0.021546 seconds
+#AlgoType B
+#ConnectGraphType C
+#Weight Wneiatm 1.00 Wextcon 1.00 Wtopodis 0.00
+#CalcFinished F
+#MoleculeA ATP_1atpE.pdb
+#MoleculeB ATP.sdf
+#FiletypeA P
+#FiletypeB S
+#NatomA 31
+#NatomB 47
+#NheavyatomA 31
+#NheavyatomB 31
+#TotalNatompair 199
+#NpermuA 0
+#NpermuB 0
+#Len_of_MATCHlist 1
+#RankMatchOutput 1
+>1
+#Npair_atom  31
+#tanimoto    1.000000
+#select_dis  0.000000
+#Ncomponent  1
+#Maxdiff_topodis  0
+#[numfileAB][numAB]   [atomnameAB][atomtype] [EC_AB] [ECdiff] [Nnei_diff]
+2939  1     1     1      PG   P1  P    20 20  0  0
+2940  2     2     2      O1G  O1  O1    5  5  0  0
+2941  3     3     3      O2G  O2  O1    5  5  0  0
+2942  4     4     4      O3G  O3  O1    5  5  0  0
+2943  5     5     5      PB   P2  P    24 24  0  0
+2944  6     6     6      O1B  O4  O1    6  6  0  0
+2945  7     7     7      O2B  O5  O1    6  6  0  0
+2946  8     8     8      O3B  O6  O    11 11  0  0
+2947  9     9     9      PA   P3  P    22 22  0  0
+2948  10    10    10     O1A  O7  O1    6  6  0  0
+2949  11    11    11     O2A  O8  O1    6  6  0  0
+2950  12    12    12     O3A  O9  O    12 12  0  0
+2951  13    13    13     O5'  O10 O    11 11  0  0
+2952  14    14    14     C5'  C1  C    13 13  0  0
+2953  15    15    15     C4'  C2  C@   18 18  0  0
+2954  16    16    16     O4'  O11 O@   15 15  0  0
+2955  17    17    17     C3'  C3  C@   17 17  0  0
+2956  18    18    18     O3'  O12 O1    7  7  0  0
+2957  19    19    19     C2'  C4  C@   18 18  0  0
+2958  20    20    20     O2'  O13 O1    7  7  0  0
+2959  21    21    21     C1'  C5  C@   21 21  0  0
+2960  22    22    22     N9   N1  N@   21 21  0  0
+2961  23    23    23     C8   C6  C@   13 13  0  0
+2962  24    24    24     N7   N2  N@   13 13  0  0
+2963  25    25    25     C5   C7  C@   19 19  0  0
+2964  26    26    26     C6   C8  C@   16 16  0  0
+2965  27    27    27     N6   N3  N1    6  6  0  0
+2966  28    28    28     N1   N4  N@   10 10  0  0
+2967  29    29    29     C2   C9  C@   10 10  0  0
+2968  30    30    30     N3   N5  N@   12 12  0  0
+2969  31    31    31     C4   C10 C@   21 21  0  0
+//
+</PRE>
+
+<LI><H3 id="format_atom_match_minimum">Minimum Atom matching file</H3><P> 
+
+When users want <I>pkcombu/fkcombu</I> to read their own atom matching file, by 
+the option <CODE>-iam</CODE>,  a much simpler format is favorable.  The <I>pkcombu/fkcombu</I> can read
+a following format, which contains only two columns; [numfile] for molecule A and [numfile]
+for molecule B. The [numfile] is an atomic number described in the molecular file.
+<PRE>
+2939  1
+2940  2
+2941  3
+2942  4
+2943  5
+2944  6
+2945  7
+2946  8
+2947  9
+2948  10
+2949  11
+2950  12
+2951  13
+2952  14
+2953  15
+2954  16
+2955  17
+2956  18
+2957  19
+2958  20
+2959  21
+2960  22
+2961  23
+2962  24
+2963  25
+2964  26
+2965  27
+2966  28
+2967  29
+2968  30
+2969  31
+</PRE>
+
+
+
+
+<A NAME="FormatLibrarySearch">
+<LI><H3>Library Search file</H3><P>
+The result file library search ("-osc") is mainly composed of two parts:
+[SIMILAR_MOLECULAR_LIST] and [ATOM_MATCHING].
+The part [SIMILAR_MOLECULAR_LIST] is the list of similar molecules with score (MCS and Descriptor),
+number of matched atom pairs, number of heavy atoms, heuristic selection score and molecular formula.
+The part [ATOM_MATCHING] is the list of atom number pairs, where the program made atomic correspondences.
+A following file is a result of searching for the query molecule G39.sdf(tamiflu) against the molecules
+stored under the directory '/DB/LIGAND-EXPO/SDF2d' using the tanimoto descriptor score threshold = 0.6, by TD-MCS1:
+
+<PRE>
+#COMMAND lkcombu -M S -Q G39.sdf -idl /DB/LIGAND-EXPO/SDF2d -con T -mtd 1 -tao 0.6 -tam 0.6 -osc G39.sch
+#DATE_START Jan 31,2012 15:12:12
+#DATE_END   Jan 31,2012 15:12:40
+#COMP_TIME  27.547554 seconds
+#QUERY_FILENAME    G39.sdf
+#QUERY_NAME        /DB/LIGAND-EXPO/SDF/G39
+#QUERY_FILETYPE    S
+#QUERY_MOLFORMULA  C14_N2_O4
+#QUERY_NATOM       20
+#QUERY_NHEAVYATOM  20
+#ALGORITHM            B
+#CONNECT_GRAPH        T
+#MAX_DIF_TOPODIS      1
+#THRE_TANIMOTO_MCS      0.600000
+#THRE_TANIMOTO_ATOMPAIR -1.000000
+#THRE_TANIMOTO_ONEATOM  0.600000
+#LIBRARY_DIRECTORY  /DB/LIGAND-EXPO/SDF2d
+#LIBRARY_DESCRIPTOR 
+#NMOL_IN_LIBRARY   13582
+#NMOL_OVER_THRE    19
+#N_LIBRARY_FILE 0
+[SIMILAR_MOLECULE_LIST]
+#[rank(1)] [molecular_num(2)] [file_num(3)] [file_offset(4)] [molecular_name(5)]
+#[similarity MCS(6)] [similarity ONEATOM(7)] [similarity ATOMPAIR(8)]
+#[Natompair(9)] [Nheavyatom(10)] [select_dis(11)] [molecular formula(12)]
+#                                                                [element_for_query]:COOCCCCNCOCCCOCCCCCN
+#                                                                   [ring_for_query]:   aaaa    aa       
+#                                                            [atom_number_for_query]:         11111111112
+#                                                                                   :12345678901234567890
+#[rk][num][name]          [sMCS][sONE][sPAIR][Npair][Nhvyatm][seldis][molform]      :--------------------
+1    9347  0 0 G39        1.000 1.000 0.000  20  20    0.000 C14_N2_O4               COOCCCCNCOCCCOCCCCCN
+2    5358  0 0 FDI        0.783 0.783 0.000  18  21   31.000 C15_N2_O4               COOCCCCNCOCCC-CCCCC-
+3    339   0 0 G28        0.708 0.783 0.000  17  21   14.000 C13_N3_O5               COOCCCCNCOCC---CCCCN
+4    8973  0 0 ST3        0.700 0.700 0.000  14  14   16.000 C9_N2_O3                COOCCCCNCOCCC------N
+5    6283  0 0 HTM        0.696 0.696 0.000  16  19   19.000 C11_N_O7                COOCCCCNCOCC-OC-CC--
+6    2501  0 0 IEM        0.696 0.773 0.000  16  19   18.000 C12_N_O6                COOCCCCNCOCC-OCC--C-
+7    13532 0 0 DYM        0.667 0.667 0.000  16  20   22.000 C11_N_O8                COOCCCCNCOCC-OCC--C-
+8    1534  0 0 ST2        0.667 0.667 0.000  14  15    7.000 C9_N2_O4                COOCCCCNCOCCC------N
+9    4030  0 0 ST5        0.652 0.652 0.000  15  18   21.000 C11_N2_O5               COOCCCCNCOCCC-C-C---
+10   355   0 0 ST6        0.652 0.727 0.000  15  18   21.000 C11_N3_O4               COOCCCCNCOCCC-C-C---
+11   6386  0 0 TYZ        0.650 0.650 0.000  13  13   27.000 C9_N_O3                 COOCCCCNCOCCC-------
+12   12195 0 0 MMR        0.625 0.773 0.000  15  19   26.000 C12_N_O6                C-OC-CCNCOCCCOCCC---
+13   10041 0 0 TNY        0.615 0.750 0.000  16  22   42.000 C12_N2_O8               C-OCCCCNCOCC-OCCC-C-
+14   3403  0 0 0AI        0.609 0.609 0.000  14  17   34.000 C9_N_O7                 COOCCCCNCOCC-OC-----
+15   10566 0 0 ST4        0.609 0.682 0.000  14  17   21.000 C10_N4_O3               COOCCCCNCOCCC-C-----
+16   10077 0 0 49A        0.600 0.667 0.000  15  20   12.000 C11_N3_O6               COOCCCCNCOCC--C-C--N
+17   12296 0 0 4AM        0.600 0.667 0.000  15  20   12.000 C11_N2_O7               COOCCCCNCOCC--C-C--N
+18   5794  0 0 AMU        0.600 0.667 0.000  15  20   30.000 C11_N_O8                C-OC-CCNCOCCCOCCC---
+19   666   0 0 MUB        0.600 0.667 0.000  15  20   30.000 C11_N_O8                C-OC-CCNCOCCCOCCC---
+[ATOM_MATCHING]
+1    |1 1|2 2|3 3|4 4|5 5|6 6|7 7|8 8|9 9|10 10|11 11|12 12|13 13|14 14|15 15|16 16|17 17|18 18|19 19|20 20
+2    |1 7|2 8|3 9|4 5|5 6|6 1|7 2|8 18|9 19|10 21|11 20|12 3|13 4|15 12|16 16|17 14|18 15|19 17
+3    |1 1|2 2|3 3|4 4|5 5|6 6|7 7|8 8|9 9|10 10|11 11|12 12|16 19|17 17|18 18|19 20|20 21
+4    |1 1|2 2|3 3|4 4|5 5|6 6|7 8|8 9|9 10|10 11|11 12|12 13|13 14|20 7
+5    |1 2|2 1|3 14|4 3|5 4|6 5|7 6|8 13|9 11|10 19|11 12|12 7|14 17|15 8|17 9|18 10
+6    |1 1|2 15|3 16|4 2|5 3|6 4|7 5|8 14|9 12|10 19|11 13|12 6|14 7|15 8|16 9|19 11
+7    |1 1|2 13|3 14|4 2|5 3|6 4|7 5|8 12|9 10|10 20|11 11|12 6|14 17|15 7|16 8|19 9
+8    |1 1|2 2|3 3|4 4|5 5|6 6|7 8|8 9|9 10|10 11|11 12|12 13|13 15|20 7
+9    |1 1|2 2|3 3|4 4|5 18|6 17|7 12|8 13|9 14|10 15|11 16|12 6|13 5|15 8|17 10
+10   |1 1|2 2|3 3|4 4|5 18|6 17|7 12|8 13|9 14|10 15|11 16|12 6|13 5|15 8|17 10
+11   |1 3|2 1|3 2|4 4|5 9|6 8|7 7|8 11|9 10|10 12|11 13|12 6|13 5
+12   |1 6|3 11|4 5|6 1|7 2|8 12|9 13|10 15|11 14|12 3|13 4|14 9|15 16|16 17|17 18
+13   |1 13|3 14|4 11|5 9|6 7|7 5|8 6|9 15|10 16|11 17|12 4|14 20|15 19|16 18|17 21|19 1
+14   |1 2|2 1|3 17|4 5|5 15|6 13|7 8|8 9|9 10|10 11|11 12|12 4|14 6|15 7
+15   |1 1|2 2|3 3|4 4|5 17|6 16|7 11|8 12|9 13|10 14|11 15|12 6|13 5|15 8
+16   |1 1|2 13|3 14|4 2|5 3|6 4|7 5|8 12|9 10|10 20|11 11|12 6|15 8|17 9|20 15
+17   |1 1|2 2|3 3|4 4|5 5|6 6|7 8|8 9|9 10|10 11|11 12|12 13|15 17|17 19|20 7
+18   |1 6|3 16|4 5|6 1|7 2|8 20|9 7|10 17|11 8|12 3|13 4|14 13|15 9|16 10|17 11
+19   |1 6|3 16|4 5|6 1|7 2|8 20|9 7|10 17|11 8|12 3|13 4|14 13|15 9|16 10|17 11
+</PRE>
+
+
+<A NAME="FormatAllvsallComparison">
+<LI><H3>All-vs-all comparison file</H3><P>
+
+
+<H4>File Format example of Similarity Matrix (-fsm S)</H4>
+<PRE>
+#COMMAND lkcombu -M A -idl src/sample_sdf -con T -mtd 1 -fsm S -osm smat.out
+#START_DATE Feb 10,2012 9:32:14
+#END_DATE   Feb 10,2012 9:32:14
+5
+SIA                      1.000    0.826    0.952    0.760    0.519
+EQP                      0.826    1.000    0.864    0.692    0.464
+DAN                      0.952    0.864    1.000    0.792    0.538
+ZMR                      0.760    0.692    0.792    1.000    0.483
+G39                      0.519    0.464    0.538    0.483    1.000
+</PRE>
+
+<H4>File Format example of Distance Matrix (-fsm D)</H4>
+<PRE>
+#COMMAND lkcombu -M A -idl src/sample_sdf -con T -mtd 1 -fsm D -osm dmat.out
+#START_DATE Feb 10,2012 9:31:59
+#END_DATE   Feb 10,2012 9:32:0
+5
+SIA                      0.000    0.174    0.048    0.240    0.481
+EQP                      0.174    0.000    0.136    0.308    0.536
+DAN                      0.048    0.136    0.000    0.208    0.462
+ZMR                      0.240    0.308    0.208    0.000    0.517
+G39                      0.481    0.536    0.462    0.517    0.000
+</PRE>
+
+<H4>File Format example of Similarity List File (-fsm L)</H4>
+<PRE>
+#>>Similarities in List format<<
+#COMMAND lkcombu -M A -idl src/sample_sdf -con T -mtd 1 -fsm L -osm list.out
+#DATE_START Feb 10,2012 9:32:48
+#LIBRARY_DIRECTORY src/sample_sdf
+#NMOL_IN_LIBRARY 5
+#DATA 0 SIA
+#DATA 1 EQP
+#DATA 2 DAN
+#DATA 3 ZMR
+#DATA 4 G39
+0 1 0.826087
+0 2 0.952381
+0 3 0.760000
+0 4 0.518519
+1 2 0.863636
+1 3 0.692308
+1 4 0.464286
+2 3 0.791667
+2 4 0.538462
+3 4 0.482759
+</PRE>
+
+<H4>File Format example of Similarity List File with molecular name(-fsm N)</H4>
+<PRE>
+#>>Similarities in List format<<
+#COMMAND lkcombu -M A -idl src/sample_sdf -con T -mtd 1 -fsm N -osm list_with_name.out
+#DATE_START Feb 10,2012 9:33:0
+#LIBRARY_DIRECTORY src/sample_sdf
+#NMOL_IN_LIBRARY 5
+#DATA 0 SIA
+#DATA 1 EQP
+#DATA 2 DAN
+#DATA 3 ZMR
+#DATA 4 G39
+0 SIA 1 EQP 0.826087
+0 SIA 2 DAN 0.952381
+0 SIA 3 ZMR 0.760000
+0 SIA 4 G39 0.518519
+1 EQP 2 DAN 0.863636
+1 EQP 3 ZMR 0.692308
+1 EQP 4 G39 0.464286
+2 DAN 3 ZMR 0.791667
+2 DAN 4 G39 0.538462
+3 ZMR 4 G39 0.482759
+</UL>
+
+
+</BODY>
+</HTML>

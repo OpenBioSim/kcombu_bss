@@ -1,0 +1,129 @@
+#!/usr/bin/env python
+##
+## <split_ccd.py>
+##
+## for splitting a chamical component dictionary cif files into many one-compound cif files
+
+
+
+import sys
+import re
+import math
+import os
+from datetime import datetime
+
+LastModDate = '2019/11/26'
+
+
+def read_option(argv,opt_dic):
+  opt_dic['COMMAND'] = argv[0]
+  now = datetime.now()
+  opt_dic['START_DATE'] = now.strftime("%Y/%m/%d %H:%M:%S")
+  for i in range(1,len(argv)):
+    opt_dic['COMMAND'] += ' '
+    opt_dic['COMMAND'] += argv[i]
+    if (argv[i][0]=='-'):
+      if ((i+1)<len(argv)):
+        opt_dic[argv[i][1:]] = argv[i+1]
+
+
+
+def write_one_content(comp_id,contents,opt_odir,opt_subdir,opt_action):
+  if (opt_subdir  == 'T'): 
+     odir  = opt_odir +  '/' + comp_id[0] 
+     ofname = opt_odir +  '/' + comp_id[0] + '/' + comp_id  + '.cif'
+  else:
+     odir = opt_odir
+     ofname = opt_odir + '/' + comp_id  + '.cif'
+  if (opt_action =='T'):
+    print "#'%s' write_to --> '%s'"%(comp_id,ofname)
+    if (os.path.exists(odir)==0):
+      print "#mkdir '%s'"%(odir)
+      os.mkdir(odir)      
+    fo = open(ofname,'w')
+    fo.write("%s"%(contents))
+    fo.close()
+  else:
+    print "#'%s' will be written to --> '%s'"%(comp_id,ofname)
+
+
+###############
+#### MAIN #####
+###############
+
+OPT = {}
+OPT['icif'] = ''
+OPT['subdir'] = 'T'
+OPT['odir'] = 'tmpout'
+OPT['A'] = 'F'
+OPT['olog'] = 'split_ccd.log'
+
+if (len(sys.argv)<3):
+  print "split_ccd.py <options>"
+  print " code by T.Kawabata. LastModified:%s"%(LastModDate)
+  print " for splitting a chamical component dictionary (CCD) cif files into many one-compound cif files"
+  print "<options>"
+  print "  -icif : input CCD 'components.cif' file [%s]"%(OPT.get('icif',''))
+  print "  -odir : output directory [%s]"%(OPT.get('odir','')) 
+  print "  -subdir : use first char subdir ex) [odir] A/ATP.sdf  ('T' or 'F') [%s]"%(OPT.get('subdir','')) 
+  print "  -olog : output log file [%s]"%(OPT.get('olog',''))
+  print "  -A    : Action. 'T' or 'F' [%s]"%(OPT.get('A',''));  
+  sys.exit(1)
+
+read_option(sys.argv,OPT)
+
+iciffile = OPT['icif']
+if not os.access(iciffile,os.R_OK):
+  print "#ERROR:Can't open ciffile '%s'"%(iciffile)
+  sys.exit(1)
+
+if (iciffile.endswith('.gz')):
+  command = "zcat %s"%(iciffile)
+  fi = os.popen(command)
+  print "#os.popen('%s')"%(command)
+else:
+  fi = open(iciffile)
+
+
+
+if (OPT.get('odir','') != '') and (os.path.exists(OPT['odir'])==0) and (OPT.get('A','')=='T'):
+  os.mkdir(OPT['odir'])
+
+
+
+contents = ''
+comp_id  = ''
+Nout_mol = 0
+for line in fi:
+  #sys.stdout.write("%s"%(line))
+  dline = line.rstrip('\n')
+  dline = dline.rstrip('\r')
+
+  if (dline.startswith("data_")):
+    if (contents != '') and (comp_id != ''):
+      Nout_mol += 1
+      write_one_content(comp_id,contents,OPT.get('odir',''),OPT.get('subdir',''),OPT.get('A',''))
+    (head,comp_id) = dline.split('_')
+    contents = ''
+ 
+  contents = contents + line 
+
+if (contents != '') and (comp_id != ''):
+  Nout_mol += 1
+  write_one_content(comp_id,contents,OPT.get('odir',''),OPT.get('subdir',''),OPT.get('A',''))
+
+fi.close()
+
+print "#Nout_mol %d"%(Nout_mol)
+
+if (OPT.get('olog','') != '') and (OPT.get('A','') == 'T'):
+  print "#write_to_logfile --> '%s'"%(OPT['olog'])
+  olog = open(OPT['olog'],'w')
+  olog.write("#COMMAND %s\n"%(OPT.get('COMMAND','')))
+  olog.write("#DATE    %s\n"%(OPT.get('START_DATE','')))
+  olog.write("#Nout_mol %d\n"%(Nout_mol))
+  for key in (OPT.keys()):
+    olog.write("#OPTION '%s' '%s'\n"%(key,OPT[key]))
+  olog.close()
+
+ 

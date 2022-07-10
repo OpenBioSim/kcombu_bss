@@ -1,0 +1,3 @@
+pkcombu -A 3D_MOL2/DT4.mol2 -B 3D_MOL2/N41.mol2 -con T -mtd 1 -gen2dA T -gen2dB T -ops out_DT4_N41_TDMCS1.ps
+fkcombu -T 3D_MOL2/DT4.mol2 -R PDB/N41_1oiyA.pdb -con T -mtd 1 -E A -S F -opdbTR out_DT4_on_N41_1oiyA.pdb
+fkcombu -T 3D_MOL2/DT4.mol2 -R PDB/N41_1oiyA.pdb -con T -mtd 1 -P PDB/1oiyA.pdb -E A -S F -opdbTRP out_DT4_on_N41_1oiyA_with_1oiyA.pdb

@@ -1,0 +1,93 @@
+<HTML>
+<HEAD>
+<TITLE>
+Instruction for the command 'ckcombu' in the "KCOMBU" program 
+</TITLE>
+<style>
+PRE {
+background-color : #E0E0E0;
+}
+CODE {
+background-color : #F0F0F0;
+}
+</style>
+</HEAD>
+
+<BODY>
+
+<CENTER>
+<H2>
+Instruction for the command 'ckcombu' in the "KCOMBU" program 
+</H2>
+</CENTER>
+
+<CENTER>
+July 23, 2015<BR>
+Takeshi Kawabata <BR>
+(kawabata@protein.osaka-u.ac.jp) <BR>
+
+Laboratory of Protein Informatics <BR>
+Institute for Protein Research, Osaka University<BR>
+</CENTER>
+<P>
+[Reference for KCOMBU]<BR>
+Kawabata T.  Build-up algorithm for atomic correspondence between chemical structure. 
+<I>J.Chem.Info.Model.</I>, <B>2011</B>, <I>51</I>, 1775-1787.
+<P>
+<HR>
+The program <I>ckcombu</I> is developed for converting the file format of chemical structure.
+Especially, the program <I>ckcombu</I> can input and output SMILES string, 
+it can generate a 2D structure of chemical comound.
+<HR>
+
+<H2>Installation</H2> <P>
+The source code of the kcombu is mainly written in C, and developed and executed
+the linux environment (actually on the Fedora Core).  
+Some additional programs for 2D graphics and statistical analyses are written in python.
+For the installation, you need the gcc compiler.
+If you want to use another compipler, please change the "Makefile" in the "src" directory.
+The standard installation procedures are as follows:
+ <P>
+ <OL>
+   <LI> download the file "kcombu-src-[date].tar.gz" file.
+
+   <LI> <PRE>tar zxvf kcombu-src-[date].tar.gz</PRE>
+
+   <LI> <PRE>cd src</PRE>
+   <LI> <PRE>make -f Makefile.ckcombu</PRE>
+ </OL>
+ <P>
+
+
+If the sources is successfully compiled, an execution file 
+"ckcombu" will appear in the "../src" directory.
+
+<P>
+<HR>
+<A NAME="dkcombu">
+<H2>Simple Usage of 'ckcombu' program</H2> <P>
+
+<UL>
+
+<LI>for converting into SDF format.
+  <PRE>$ckcombu -A [molecule_file] -osdf [output SDF file]</PRE>
+<LI>for converting into SMILES format.
+  <PRE>$ckcombu -A [molecule_file] -osmi [output SMILES file]</PRE>
+<LI>for making 2D-coordinates and writing in SDF format.
+  <PRE>$ckcombu -A [molecule_file] -gen2d T -osdf [output SDF file]</PRE>
+<LI>for assigning 'DAMRL' atomic classification as the ChainID of output PDB file.
+  <PRE>$ckcombu -A [molecule_file] -opdbdamrl [output PDB file]</PRE>
+<LI>for showing options in detail
+  <PRE>$ckcombu -h</PRE>
+
+</UL>
+
+<HR>
+<H4>Reference</H4>
+<OL>
+<LI> Weininger, D. SMILES, a chemical language and information system. 1. Introduction to methodology and encoding rules. <I>J. Chem. Inf.Comput. Sci.</I> 28, 31-36 (1988).
+<LI> Weininger, D., Weininger, A. & Weininger, J. L. SMILES. 2. a lgorithms for generation of unique SMILES notation. <I>J. Chem. Inf. Comput. Sci.</I> 29, 97-101 (1989). 
+</OL>
+
+</BODY>
+</HTML>
