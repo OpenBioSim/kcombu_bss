@@ -103,4 +103,5 @@ add_executable(propsearch_bss ${PROPSEARCH_SOURCES})
 
 # installation
 install(TARGETS ckcombu_bss dkcombu_bss fkcombu_bss
-                lkcombu_bss pkcombu_bss)
+                lkcombu_bss pkcombu_bss
+                smicomp_bss treeun_bss propsearch_bss)

@@ -22,6 +22,10 @@ This software is released under the three-clause BSD License, see LICENSE.txt.
 #include "globalvar.h"
 #include "molecule.h"
 
+#if defined(_WIN32) || defined(WIN32)
+#define popen _popen
+#endif
+
 /** FUNCTIONS (GLOBAL) **/
 int Read_LINENODEs();
 void Add_string_to_LINENODEs();

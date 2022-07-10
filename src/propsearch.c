@@ -16,8 +16,15 @@ This software is released under the three-clause BSD License, see LICENSE.txt.
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
-#include <sys/time.h>
-#include <dirent.h>
+
+#if defined(_WIN32) || defined(WIN32)
+  #include "windows.h"
+  #include "dirent_windows.h"
+  #include "time_windows.h"
+#else
+  #include <sys/time.h>
+  #include <dirent.h>
+#endif
 
 #define MAX_LINE     2500 
 #define MAX_FILESIZE 512

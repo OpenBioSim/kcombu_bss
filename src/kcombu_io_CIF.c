@@ -23,8 +23,9 @@ the GNU Lesser General Public License (LGPL), see LICENSE.txt.
 #include "kcombu_io_CIF.h"
 #include "molecule.h"
 
-
-
+#if defined(_WIN32) || defined(WIN32)
+#define popen _popen
+#endif
 
 /* Functions (GLOBAL) */
 void   read_CIF_file_into_BLOCK();

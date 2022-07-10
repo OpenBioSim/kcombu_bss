@@ -20,6 +20,9 @@ This software is released under the three-clause BSD License, see LICENSE.txt.
 
 #if defined(_WIN32) || defined(WIN32)
   #include "windows.h"
+  #include "dirent_windows.h"
+  #include "time_windows.h"
+  #define popen _popen
 #else
   #include <sys/time.h>
   #include <dirent.h>

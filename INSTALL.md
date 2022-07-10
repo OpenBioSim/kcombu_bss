@@ -74,7 +74,7 @@ $ cmake ..\src\ -G "Visual Studio 15 2017 Win64"
 Compile using `cmake --build` e.g.
 
 ```
-$ cmake --build .
+$ cmake --build . --config Release
 ```
 
 Install via

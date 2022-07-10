@@ -17,8 +17,15 @@ This software is released under the three-clause BSD License, see LICENSE.txt.
 #include <string.h>
 #include <math.h>
 #include <time.h>
-#include <sys/time.h>
-#include <dirent.h>
+
+#if defined(_WIN32) || defined(WIN32)
+  #include "windows.h"
+  #include "dirent_windows.h"
+  #include "time_windows.h"
+#else
+  #include <sys/time.h>
+  #include <dirent.h>
+#endif
 
 #define HASH_SIZE_MALLOC  10000
 #define MAX_LINE          2500
@@ -188,7 +195,7 @@ void Free_MOLECULE(head)
 
 int read_SMILES_file(ifname,HeadMolSmilesLen,DIVbunshi,DIVbunbo)
   char *ifname;
-  struct MOLECULE HeadMolSmilesLen[HASH_SIZE];
+  struct MOLECULE HeadMolSmilesLen[HASH_SIZE_MALLOC];
   int  DIVbunshi,DIVbunbo;
   /*
     read only if (Lsmiles%DIVbunbo)==DIVbunshi.
