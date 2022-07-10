@@ -10,6 +10,8 @@ This software is released under the three-clause BSD License, see LICENSE.txt.
 ==============================================================================
 ```
 
+[Installation instructions are here](INSTALL.md)
+
 This fork adds code to;
 
 * use `cmake` to support compilation on a range of plaforms
