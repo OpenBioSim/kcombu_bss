@@ -1,0 +1,35 @@
+{% set name = "kcombu_bss" %}
+
+package:
+  name: {{ name }}
+  version: 1.0
+
+source:
+  git_url: https://github.com/chryswoods/kcombu_bss.git
+  git_tag: main
+
+build:
+  number: 1
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+
+test:
+  commands:
+    - test -f $PREFIX/bin/fkcombu_bss
+
+about:
+  home: https://github.com/chryswoods/kcombu_bss
+  license: BSD-3-Clause
+  license_file: '{{ environ["RECIPE_DIR"] }}/LICENSE'
+  summary: A tool for flexible transformation of a target molecule onto a reference molecule.
+  dev_url: https://github.com/chryswoods/kcombu_bss
+  doc_url: https://github.com/chryswoods/kcombu_bss
+  description: A tool for flexible transformation of a target molecule onto a reference molecule.
+
+extra:
+  recipe-maintainers:
+    - chryswoods
+    - jmichel80
+    - lohedges
