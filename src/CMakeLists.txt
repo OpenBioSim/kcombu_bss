@@ -114,7 +114,28 @@ else()
   target_link_libraries(propsearch_bss m)
 endif()
 
+# Set the installation path automatically if this is a conda build
+if ("$ENV{CONDA_BUILD}" STREQUAL "1")
+  set(KCOMBU_PREFIX "$ENV{PREFIX}")
+
+  message(STATUS "Performing a conda build installing to ${KCOMBU_PREFIX}")
+
+  if (WIN32)
+    string(REPLACE "\\" "/" KCOMBU_PREFIX ${KCOMBU_PREFIX})
+    set(CMAKE_INSTALL_PREFIX "${KCOMBU_PREFIX}")
+    set(KCOMBU_BINDIR "Scripts")
+  else()
+    set(CMAKE_INSTALL_PREFIX "${KCOMBU_PREFIX")
+    set(KCOMBU_BINDIR "bin")
+  endif()
+
+else()
+  message(STATUS "Installing using prefix ${CMAKE_INSTALL_PREFIX}")
+  set(KCOMBU_BINDIR "bin")
+endif()
+
 # installation
 install(TARGETS ckcombu_bss dkcombu_bss fkcombu_bss
                 lkcombu_bss pkcombu_bss
-                smicomp_bss treeun_bss propsearch_bss)
+                smicomp_bss treeun_bss propsearch_bss
+        RUNTIME DESTINATION "${KCOMBU_BINDIR}")
