@@ -125,7 +125,7 @@ if ("$ENV{CONDA_BUILD}" STREQUAL "1")
     set(CMAKE_INSTALL_PREFIX "${KCOMBU_PREFIX}")
     set(KCOMBU_BINDIR "Scripts")
   else()
-    set(CMAKE_INSTALL_PREFIX "${KCOMBU_PREFIX")
+    set(CMAKE_INSTALL_PREFIX "${KCOMBU_PREFIX}")
     set(KCOMBU_BINDIR "bin")
   endif()
 
