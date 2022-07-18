@@ -79,6 +79,7 @@ jobs:
 #
       - name: Build Conda package using mamba build
         run: conda mambabuild --croot ${{ github.workspace }}/build -c conda-forge -c michellab ${{ github.workspace }}/kcombu_bss/recipes/kcombu_bss
+        if: matrix.platform.name != 'windows' || matrix.python-version != '3.7'
 #
       - name: Build Conda package using conda build
         run: conda build --croot ${{ github.workspace }}/build -c conda-forge -c michellab ${{ github.workspace }}/kcombu_bss/recipes/kcombu_bss
