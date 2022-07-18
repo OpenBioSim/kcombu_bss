@@ -102,6 +102,8 @@ add_executable(treeun_bss ${TREEUN_SOURCES})
 add_executable(propsearch_bss ${PROPSEARCH_SOURCES})
 
 if (WIN32)
+  message(STATUS "Not linking to the math library")
+else()
   target_link_libraries(ckcombu_bss m)
   target_link_libraries(dkcombu_bss m)
   target_link_libraries(fkcombu_bss m)
