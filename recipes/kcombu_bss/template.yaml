@@ -15,10 +15,6 @@ requirements:
   build:
     - {{ compiler('c') }}
 
-test:
-  commands:
-    - test -f $PREFIX/bin/fkcombu_bss
-
 about:
   home: https://github.com/chryswoods/kcombu_bss
   license: BSD-3-Clause
