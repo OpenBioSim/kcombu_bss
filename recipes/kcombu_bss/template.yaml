@@ -2,7 +2,7 @@
 
 package:
   name: {{ name }}
-  version: {{ KCOMBU_VERSION }}
+  version: {{ "KCOMBU_VERSION" }}
 
 source:
   git_url: https://github.com/chryswoods/kcombu_bss.git
