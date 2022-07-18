@@ -30,6 +30,8 @@ def run_cmd(cmd):
 
 gitdir = os.path.join(srcdir, ".git")
 
+print(f"git dir is {gitdir}")
+
 # Get the Sire version. (Latest tag.)
 kcombu_version = run_cmd(f"git --git-dir={gitdir} --work-tree={srcdir} describe --tags --abbrev=0")
 print(kcombu_version)
