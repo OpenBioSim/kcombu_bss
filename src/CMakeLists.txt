@@ -101,6 +101,15 @@ add_executable(smicomp_bss ${SMICOMP_SOURCES})
 add_executable(treeun_bss ${TREEUN_SOURCES})
 add_executable(propsearch_bss ${PROPSEARCH_SOURCES})
 
+target_link_libraries(ckcombu_bss m)
+target_link_libraries(dkcombu_bss m)
+target_link_libraries(fkcombu_bss m)
+target_link_libraries(lkcombu_bss m)
+target_link_libraries(pkcombu_bss m)
+target_link_libraries(smicomp_bss m)
+target_link_libraries(treeun_bss m)
+target_link_libraries(propsearch_bss m)
+
 # installation
 install(TARGETS ckcombu_bss dkcombu_bss fkcombu_bss
                 lkcombu_bss pkcombu_bss

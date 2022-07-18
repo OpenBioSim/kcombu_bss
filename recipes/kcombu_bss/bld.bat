@@ -5,4 +5,4 @@ mkdir build
 cd build
 cmake ..\src
 cmake --build . --config Release
-cmake --install .
+cmake --install . --prefix Env:PREFIX
