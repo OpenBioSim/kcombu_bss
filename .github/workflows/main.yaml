@@ -21,7 +21,7 @@ jobs:
       matrix:
         # C executable should be compatible with all versions of Python
         # (only if there isn't an ABI change in the compiler)
-        python-version: ["3.7", "3.8", "3.9"]
+        python-version: ["3.9"]
         platform:
           - {
               name: "windows",
