@@ -60,11 +60,11 @@ jobs:
           use-mamba: true
 #
       - name: Clone the devel branch (push to devel)
-        run: git clone https://github.com/chryswoods/kcombu_bss
+        run: git clone https://github.com/michellab/kcombu_bss
         if: github.event_name != 'pull_request'
 #
       - name: Clone the feature branch (pull request to devel)
-        run: git clone -b ${{ github.head_ref }} --single-branch https://github.com/chryswoods/kcombu_bss
+        run: git clone -b ${{ github.head_ref }} --single-branch https://github.com/michellab/kcombu_bss
         if: github.event_name == 'pull_request'
 #
       - name: Setup Conda
