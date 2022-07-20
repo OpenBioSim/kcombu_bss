@@ -39,7 +39,7 @@ jobs:
               shell: "bash -l {0}"
             }
     environment:
-      name: kcombu-build
+      name: kcombu_bss-build
     defaults:
       run:
         shell: ${{ matrix.platform.shell }}
