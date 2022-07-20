@@ -69,11 +69,7 @@ jobs:
 #
       - name: Setup Conda
         run: mamba install -y -c conda-forge boa anaconda-client
-#
-      - name: Update Conda recipe
-        run:
-          python ${{ github.workspace }}/kcombu_bss/actions/update_recipe.py
-#
+
       - name: Prepare build location
         run: mkdir ${{ github.workspace }}/build
 #
