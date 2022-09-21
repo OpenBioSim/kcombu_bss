@@ -15,6 +15,7 @@ build:
 requirements:
   build:
     - {{ compiler('c') }}
+    - cmake
 
 about:
   home: https://github.com/michellab/kcombu_bss
