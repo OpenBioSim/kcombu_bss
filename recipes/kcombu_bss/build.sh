@@ -6,5 +6,5 @@ mkdir build
 cd build
 cmake ../src
 cmake --build . --config Release
-cmake --install . --prefix $PREFIX
+cmake --install .
 cd -
