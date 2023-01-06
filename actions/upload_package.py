@@ -1,4 +1,3 @@
-
 import os
 import sys
 import glob
@@ -42,30 +41,19 @@ packages = " ".join(packages)
 
 def run_cmd(cmd):
     import subprocess
+
     p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
     return str(p.stdout.read().decode("utf-8")).lstrip().rstrip()
 
-gitdir = os.path.join(srcdir, ".git")
 
-tag = run_cmd(f"git --git-dir={gitdir} --work-tree={srcdir} tag --contains")
+print(f"\nLabelling with 'main' and 'dev'.")
+label = "--label main --label dev"
 
-# If the tag is not empty, then set the label to main (this is a release)
-if tag is not None and tag.lstrip().rstrip() != "":
-    print(f"\nTag {tag} is set. This is a 'main' release.")
-    label = "--label main --label dev"
-else:
-    # this is a development release
-    print("\nNo tag is set. This is a 'devel' release.")
-    label = "--label dev"
-
-# Upload the packages to the michellab channel on Anaconda Cloud.
-cmd = f"anaconda --token {conda_token} --user michellab {label} --force {packages}"
+# Upload the packages to the openbiosim channel on Anaconda Cloud.
+cmd = f"anaconda --token {conda_token} upload --user openbiosim {label} --force {packages}"
 
 print(f"\nUpload command:\n\n{cmd}\n")
 
-# Label release packages with main and dev so that dev is at least as new as
-# main. Only need to uncomment the libcpuid and fkcombu package uploads when
-# there new versions are released.
 if conda_token == "TEST":
     print("Not uploading as the ANACONDA_TOKEN is not set!")
     sys.exit(-1)
