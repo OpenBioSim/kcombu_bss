@@ -1,4 +1,3 @@
-
 import os
 import sys
 import glob
@@ -39,16 +38,19 @@ print(" * ", "\n *  ".join(packages))
 
 packages = " ".join(packages)
 
+
 def run_cmd(cmd):
     import subprocess
+
     p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
     return str(p.stdout.read().decode("utf-8")).lstrip().rstrip()
+
 
 print(f"\nLabelling with 'main' and 'dev'.")
 label = "--label main --label dev"
 
-# Upload the packages to the michellab channel on Anaconda Cloud.
-cmd = f"anaconda --token {conda_token} upload --user michellab {label} --force {packages}"
+# Upload the packages to the openbiosim channel on Anaconda Cloud.
+cmd = f"anaconda --token {conda_token} upload --user openbiosim {label} --force {packages}"
 
 print(f"\nUpload command:\n\n{cmd}\n")
 
