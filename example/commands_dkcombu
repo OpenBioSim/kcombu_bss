@@ -1,2 +1,2 @@
-dkcombu -M D -idl 2D_SDF -odes out_2D_SDF.des
-dkcombu -M S -Q 2D_SDF/G39.sdf -ides out_2D_SDF.des -con T -mtd 1 -osc out_dkcombu_G39.sch
+dkcombu_bss -M D -idl 2D_SDF -odes out_2D_SDF.des
+dkcombu_bss -M S -Q 2D_SDF/G39.sdf -ides out_2D_SDF.des -con T -mtd 1 -osc out_dkcombu_G39.sch

@@ -1,4 +1,4 @@
-ckcombu -A 2D_SDF/TYR.sdf -osmi out_TYR.smi
-ckcombu -A 3D_SDF/PHE.sdf -gen2d T -ops  out_PHE.ps
-ckcombu -A 3D_SDF/PHE.sdf -gen2d T -ops  out_PHE.ps
-ckcombu -A out_TYR.smi -gen2d T -ops  out_TYR.ps
+ckcombu_bss -A 2D_SDF/TYR.sdf -osmi out_TYR.smi
+ckcombu_bss -A 3D_SDF/PHE.sdf -gen2d T -ops  out_PHE.ps
+ckcombu_bss -A 3D_SDF/PHE.sdf -gen2d T -ops  out_PHE.ps
+ckcombu_bss -A out_TYR.smi -gen2d T -ops  out_TYR.ps

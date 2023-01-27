@@ -1,5 +1,5 @@
-pkcombu -A 2D_SDF/ALA.sdf -B 2D_SDF/SER.sdf -ops out_ALA_SER_CMCS.ps
-pkcombu -A 2D_SDF/D01977.sdf -B 2D_SDF/D09883.sdf  -con T -mtd 1 -ops out_D01977_D09883_TDMCS1.ps
-pkcombu -A 2D_SDF/SIA.sdf -B 2D_SDF/G39.sdf -con C -ops out_SIA_G39_CMCS.ps
-pkcombu -A 2D_SDF/SIA.sdf -B 2D_SDF/G39.sdf -con T -mtd 1  -ops out_SIA_G39_TDMCS1.ps
-pkcombu -A 2D_SDF/G39.sdf -B 2D_SDF/DAN.sdf -con T -mtd 1  -ops out_G39_DAN_TDMCS1.ps
+pkcombu_bss -A 2D_SDF/ALA.sdf -B 2D_SDF/SER.sdf -ops out_ALA_SER_CMCS.ps
+pkcombu_bss -A 2D_SDF/D01977.sdf -B 2D_SDF/D09883.sdf  -con T -mtd 1 -ops out_D01977_D09883_TDMCS1.ps
+pkcombu_bss -A 2D_SDF/SIA.sdf -B 2D_SDF/G39.sdf -con C -ops out_SIA_G39_CMCS.ps
+pkcombu_bss -A 2D_SDF/SIA.sdf -B 2D_SDF/G39.sdf -con T -mtd 1  -ops out_SIA_G39_TDMCS1.ps
+pkcombu_bss -A 2D_SDF/G39.sdf -B 2D_SDF/DAN.sdf -con T -mtd 1  -ops out_G39_DAN_TDMCS1.ps
