@@ -308,6 +308,7 @@ void Initialize_MOLECULE(mol)
   mol->atoms = NULL; 
   mol->bonds = NULL; 
   mol->Natom = 0;
+  mol->maxNatom = 0;
   mol->Nbond = 0;
   mol->Nheavyatom = 0; 
   mol->Nheavybond = 0;
