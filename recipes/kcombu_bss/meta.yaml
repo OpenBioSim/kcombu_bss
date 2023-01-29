@@ -1,5 +1,5 @@
 {% set name = "kcombu_bss" %}
-{% set version = "2023.06.01" %}
+{% set version = "2023.29.01" %}
 
 package:
     name: {{ name }}
