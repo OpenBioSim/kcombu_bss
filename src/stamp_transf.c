@@ -1795,6 +1795,7 @@ int Check_Bond_Angle_Difference(molA, molB,M, OutStdOut)
   struct MOLECULE *molA; /* target    */
   struct MOLECULE *molB; /* reference */
   struct MATCH *M;
+  int OutStdOut;
 {
   int i,j,k;
   int ai,aj,ak,bi,bj,bk;

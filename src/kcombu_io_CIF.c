@@ -989,6 +989,7 @@ int  number_of_WORDs(HeadWordNode)
 
 void free_ROWLINEs(head_rowline,Ncolumn)
   struct ROWLINE *head_rowline;
+  int Ncolumn;
 {
  struct ROWLINE *current, *next;
  int i;

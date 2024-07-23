@@ -139,7 +139,7 @@ double Get_Time_in_Second_by_Double()
 
 
 
-double Set_Comp_Time(start_time_sec){
+double Set_Comp_Time(double start_time_sec){
  double end_sec;
  end_sec = Get_Time_in_Second_by_Double();
  return(end_sec - start_time_sec);

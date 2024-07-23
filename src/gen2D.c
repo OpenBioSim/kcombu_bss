@@ -1561,6 +1561,7 @@ void cal_mid_point(bdir,o,a,b,c)
   float *bdir;      /* [2] dir vector for mid point na-o-nb */
   float *o;            /* [2] xy of origin (given) */
   float *a,*b;      /* [2] xy of neighbors a,b,c (given)*/
+  int c;
 {
   /* 
        m  
